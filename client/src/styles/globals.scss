@@ -1,0 +1,172 @@
+// styles/globals.scss
+
+@import './variables';
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1, h2, h3 {
+  color: map-get($light-theme, text);
+}
+
+body {
+  background-color: map-get($light-theme, background);
+  color: map-get($light-theme, text);
+  transition: background-color 0.3s, color 0.3s;
+  font-family: Arial, sans-serif;
+}
+
+
+button {
+  background-color: map-get($light-theme, button-bg);
+  color: map-get($light-theme, button-text);
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: map-get($light-theme, header);
+}
+
+header a {
+    text-decoration: none;
+    color: map-get($light-theme, header-text);
+}
+
+nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.createPost {
+  display: flex;
+  flex-direction: column;
+  max-width: 1220px;
+  margin: 10px auto;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid map-get($light-theme, post-border);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: map-get($light-theme, post);
+}
+
+.post {
+    background-color: map-get($light-theme, post);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid map-get($light-theme, post-border);
+    color: map-get($light-theme, text);
+    position: relative;
+    margin: 10px;
+}
+.post p {
+  color: black;
+}
+
+.comment {
+    background-color: map-get($light-theme, comment);
+    border-radius: 10px;
+    border: 1px solid map-get($light-theme, post-border);
+    padding: 20px;
+    color: map-get($light-theme, comment-text);
+    position: relative;
+    margin: 10px;
+}
+.comment p {
+  color: map-get($light-theme, comment-text);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 100;
+  color: red;
+}
+
+body.dark {
+  background-color: map-get($dark-theme, background);
+  color: map-get($dark-theme, text);
+}
+
+body.dark .post {
+    background-color: map-get($dark-theme, post);
+    color: white;
+}
+body.dark .post p {
+  color: white;
+}
+body.dark .comment {
+  background-color: map-get($dark-theme, comment);
+}
+body.dark .modalContent {
+  background-color: map-get($dark-theme, background);
+  color: white;
+}
+body.dark .header {
+  background-color: map-get($dark-theme, header);
+}
+body.dark .header nav a{
+  color: white;
+}
+
+body.dark .createPost {
+  background-color: map-get($dark-theme, post);
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

@@ -1,0 +1,51 @@
+.username {
+    margin: 5px;
+}
+.postContent {
+    margin: 20px;
+}
+.likeButton {
+    background-color: azure;
+    color: black;
+    margin-right: 10px;
+}
+.deleteButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+}
+.likeComContainer {
+    display: flex;
+    margin: 20px;
+    margin-top: 40px;
+}
+
+.input { 
+    margin: 20px;
+    padding: 10px;
+    border: none;
+
+}
+.comment {
+    position: relative;
+    background-color: #7a7a7a;
+    padding: 5px;
+    margin: 5px;
+}
+.avatar {
+    max-width: 45px;
+    max-height: 45px;
+    border-radius: 100%;
+}
+.userContainer {
+    display: flex;
+    top: 5px;
+    left: 5px;
+    align-items: center;
+    margin: 10px;
+}
+.postImage {
+    max-width: 1280px;
+    max-height: 720px;
+}

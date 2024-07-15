@@ -1,0 +1,37 @@
+
+.deleteButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+}
+
+.userContainer {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Первая колонка для аватара, вторая колонка занимает оставшееся пространство */
+    grid-template-rows: auto auto; /* Две строки для никнейма и даты */
+    row-gap: 0px;
+    column-gap: 10px;
+    align-items: center; /* Выравнивание элементов по верхнему краю */
+    grid-template-areas: 
+    "avatar username"
+    "avatar date";
+  }
+  
+  .avatar {
+    grid-area: avatar; /* Позиция аватара в сетке */
+    max-width: 45px;
+    max-height: 45px;
+    border-radius: 100%;
+  }
+  
+  .username {
+    grid-area: username; /* Позиция никнейма в сетке */
+  }
+  
+  .date {
+    grid-area: date; /* Позиция даты в сетке */
+  }
+  .postContent {
+    margin-top: 20px;
+  }
