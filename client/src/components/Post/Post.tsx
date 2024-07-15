@@ -9,12 +9,12 @@ import Comment from '../Comment/Comment';
 import Link from 'next/link';
 import Modal from '../ui/Modal';
 import PostModal from '../Modals/ModalPost/ModalPost';
-
-import { Post } from '../../types/types';
+import { Post as PostType, Comment as CommentType } from '../../types/types';
 import ModalLikes from '../Modals/ModalLikes/ModalLikes';
+import {deleteIcon, likeIcon, unLikeIcon, commentsIcon} from '../../assets/'; // Импортируем иконку
 
 interface PostProps {
-  post: Post;
+  post: PostType;
 }
 
 const Post: React.FC<PostProps> = ({ post }) => {
@@ -24,7 +24,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalLikesOpen, setIsModalLikesOpen] = useState(false);
 
-  const emptyComment: Comment = {
+  const emptyComment: CommentType = {
     id: 0,
     content: '',
     userId: 0,
@@ -110,19 +110,33 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
         className={styles.postImage}
       />
       {authUser?.id === post.userId ? (
-        <button onClick={() => handleDeletePost(post.id)} className={styles.deleteButton}>DELETE POST</button>
+ <img src={deleteIcon.src} onClick={() => handleDeletePost(post.id)} className={styles.deleteButton} alt="Delete" />
       ) : (
         <></>
       )}
       <div className={styles.likeComContainer}>
-        <button onClick={() => handleLike(post.id, post.userId)} className={styles.likeButton}>{post.likeStatus ? 'Unlike' : 'Like'}</button>
-        <p onClick={() => setIsModalLikesOpen(true)}>
-          ({post.Likes ? post.Likes?.length : 0})
-        </p>
-        <button>Comments: {post.Comments ? post.Comments.length : 0}</button>
+
+        <div className={styles.likeContainer}>
+          {post.likeStatus ? (
+            <img src={likeIcon.src} alt="like"  onClick={() => handleLike(post.id, post.userId)} className={styles.likeButton}/>
+          ) : (
+            <img src={unLikeIcon.src} alt="unlike"  onClick={() => handleLike(post.id, post.userId)} className={styles.likeButton}/>
+            )}
+          <p onClick={() => setIsModalLikesOpen(true)}>
+            {post.Likes ? post.Likes?.length : 0}
+          </p>
+        </div>
+
+        <div className={styles.commentsContainer}>
+          <img src={commentsIcon.src} alt="comments" className={styles.commentsButton} onClick={() => setIsModalOpen(true)}/>
+          <p>{post.Comments ? post.Comments.length : 0}</p>
+        </div>
+
       </div>
-      <input placeholder='comment' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
-      <button onClick={() => handleAddComment(post.id)}>Отправить комментарий</button>
+      <div className={styles.sendCommentContainer}>
+        <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
+        <button onClick={() => handleAddComment(post.id)} className={styles.sendComment}>Отправить</button>
+      </div>
       <div>
         {post.Comments?.length > 0 ? (
           <>
@@ -134,6 +148,7 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
               post={post}
               handleDeleteComment={handleDeleteComment}
             />
+             <p onClick={() => setIsModalOpen(true)} className={styles.showMoreComments}>Показать все комментарии...</p>
           </>
         ) : (
           <></>
@@ -144,9 +159,11 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
         setIsModalOpen={setIsModalOpen}
       >
          <PostModal
-        post={post} 
+        post={post}
+        date={formattedDate}
         handleDeletePost={handleDeletePost}
         handleLike={handleLike}
+        setIsModalLikesOpen={setIsModalLikesOpen}
         />
       </Modal>
       <Modal
@@ -155,7 +172,6 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
       >
         <ModalLikes likes={post.Likes}/>
       </Modal>
-      <button onClick={() => setIsModalOpen(true)}>Открыть пост</button>
     </div>
   );
 };

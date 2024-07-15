@@ -3,10 +3,11 @@ import styles from './Comment.module.scss'
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Post, Comment, User, Like } from '../../types/types';
+import { Post, Comment as CommentType, User, Like } from '../../types/types';
+import {deleteIcon} from '../../assets/'; // Импортируем иконку
 
 interface CommentProps {
-    comment: Comment;
+    comment: CommentType;
     authUser: {
         id: number;
         username: string;
@@ -49,7 +50,7 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
           
           <p className={styles.postContent}>{comment?.content}</p>
           {authUser?.id === comment?.userId || authUser?.id === post.userId ? (
-           <button onClick={() => handleDeleteComment(post.id, comment.id)} className={styles.deleteButton}>Удалить комментарий</button>
+           <img src={deleteIcon.src} onClick={() => handleDeleteComment(post.id, comment.id)} className={styles.deleteButton} alt="Delete"/>
           ) : (
           <></>
           )}

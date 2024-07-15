@@ -1,8 +1,11 @@
 .avatar {
-    max-width: 45px;
-    max-height: 45px;
-    border-radius: 100%;
-}
+    display: block; /* Убираем отступы по умолчанию */
+    width: 45px; /* Задайте ширину */
+    height: 45px; /* Задайте высоту */
+    border-radius: 50%; /* Сделает контейнер круглым */
+    object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
+  }
+  
 .userContainer {
     display: flex;
     align-items: center;

@@ -1,51 +1,105 @@
-.username {
-    margin: 5px;
-}
 .postContent {
-    margin: 20px;
+  margin-top: 30px;
+  position: relative;
 }
 .likeButton {
-    background-color: azure;
-    color: black;
-    margin-right: 10px;
+  margin-right: 10px;
+  max-width: 20px;
+  max-height: 20px;
+  cursor: pointer;
 }
+.commentsButton {
+margin-right: 10px;
+max-width: 20px;
+max-height: 20px;
+}
+
 .deleteButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: red;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 25px;
+  max-height: 25px;
+  cursor: pointer;
 }
 .likeComContainer {
-    display: flex;
-    margin: 20px;
-    margin-top: 40px;
+  display: flex;
+  margin-top: 40px;
+}
+.likeContainer {
+padding: 10px;
+background-color: rgb(206, 206, 206);
+border-radius: 10px;
+display: flex;
+align-items: center;
+}
+.commentsContainer {
+margin-left: 10px;
+padding: 10px;
+background-color: rgb(206, 206, 206);
+border-radius: 10px;
+display: flex;
+align-items: center;
+}
+
+.sendComment {
+margin-left: 10px;
+border-radius: 10px;
+}
+.sendCommentContainer {
+margin-top: 10px;
+display: flex;
+align-items: center;
 }
 
 .input { 
-    margin: 20px;
-    padding: 10px;
-    border: none;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+}
+.input:focus {
+outline: none;
+}
 
-}
-.comment {
-    position: relative;
-    background-color: #7a7a7a;
-    padding: 5px;
-    margin: 5px;
-}
-.avatar {
-    max-width: 45px;
-    max-height: 45px;
-    border-radius: 100%;
-}
 .userContainer {
-    display: flex;
-    top: 5px;
-    left: 5px;
-    align-items: center;
-    margin: 10px;
+  display: grid;
+  grid-template-columns: auto 1fr; /* Первая колонка для аватара, вторая колонка занимает оставшееся пространство */
+  grid-template-rows: auto auto; /* Две строки для никнейма и даты */
+  row-gap: 0px;
+  column-gap: 10px;
+  align-items: center; /* Выравнивание элементов по верхнему краю */
+  grid-template-areas: 
+  "avatar username"
+  "avatar date";
+}
+
+.avatar {
+  grid-area: avatar; /* Позиция аватара в сетке */
+  display: block; /* Убираем отступы по умолчанию */
+  width: 45px; /* Задайте ширину */
+  height: 45px; /* Задайте высоту */
+  border-radius: 50%; /* Сделает контейнер круглым */
+  object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
+}
+
+
+.username {
+  grid-area: username; /* Позиция никнейма в сетке */
+}
+
+.date {
+  grid-area: date; /* Позиция даты в сетке */
+  font-size: 12px;
 }
 .postImage {
-    max-width: 1280px;
-    max-height: 720px;
+  margin-top: 15px;
+  position: relative;
+  width: 100%;
+}
+
+.showMoreComments {
+margin-left: 10px;
+color: rgb(152, 145, 255) !important;
+cursor: pointer;
 }

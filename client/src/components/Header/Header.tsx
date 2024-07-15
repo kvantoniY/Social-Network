@@ -36,11 +36,13 @@ const Header = () => {
             <button>Уведомления</button>
             <Link href={`/users/${user.id}`}>
             <div className={styles.userContainer}>
+
             <img
             src={`http://localhost:3001/` + user?.image || "default.jpg"}
             alt=""
             className={styles.avatar}
           />
+         
               <p>{user.username}</p>
               <button onClick={handleLogout}>Logout</button>
               </div>

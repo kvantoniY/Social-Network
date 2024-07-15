@@ -1,7 +1,7 @@
 // src/components/PostModal.tsx
 import React from 'react';
 import styles from './ModalPost.module.scss';
-
+import {closeModal} from '../../assets/'
 
 interface ModalProps {
   isOpen: boolean;
@@ -22,11 +22,16 @@ const Modal: React.FC<ModalProps> = ({
   const onClose = () => {
     setIsModalOpen(!isOpen)
   }
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  }
 
   return (
-    <div className='modalOverlay'>
+    <div className='modalOverlay' onClick={handleOverlayClick}>
       <div className='modalContent'>
-        <button className='closeButton' onClick={onClose}>X</button>
+        <img src={closeModal.src} className='closeButton' onClick={onClose} />
         {children}
       </div>
     </div>

@@ -3,18 +3,25 @@ import React from 'react'
 
 
 interface ModalLikesProps {
-    likes: Like[];
+  likes: Like[];
 }
 
-const ModalLikes:React.FC<ModalLikesProps> = ({likes}) => {
+const ModalLikes: React.FC<ModalLikesProps> = ({ likes }) => {
   return (
     <div>
-        {likes.map(like => (
+      {likes.length > 0 ? (
+        <>
+          {likes.map(like => (
             <div>
-            {like.User?.username}
+              {like.User?.username}
 
             </div>
-        ))}
+          ))}
+        </>
+      ) : (
+        <p>Пока никто не лайкнул пост :(</p>
+      )}
+
     </div>
   )
 }
