@@ -5,8 +5,10 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { checkToken } from '@/features/auth/authAPI';
 import Link from 'next/link';
-import ThemeToggle from '../ThemeToggle';
+import ThemeToggle from './ThemeToggle';
 import styles from "./Header.module.scss"
+
+import { dialogsIcon, homeIcon, subsIcon, logoutIcon, noticeIcon } from '../../assets/'
 
 const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,28 +27,31 @@ const Header = () => {
 
   return (
     <header className='header'>
-      <nav>
+      <nav className={styles.nav}>
         {user ? (
           <>
-            <Link href="/feed">Лента</Link>
-            <Link href="/dialogs">Диалоги</Link>
-            <Link href="/follows">Друзья</Link>
-            <ThemeToggle />
-            
-            <button>Уведомления</button>
-            <Link href={`/users/${user.id}`}>
-            <div className={styles.userContainer}>
+            <div className={styles.navMenu}>
+              <Link href="/feed"><img src={homeIcon.src} alt="Feed" /></Link>
+              <Link href="/dialogs"><img src={dialogsIcon.src} alt="dialogs" /></Link>
+              <Link href="/follows"><img src={subsIcon.src} alt="Subs" /></Link>
+              <ThemeToggle />
 
-            <img
-            src={`http://localhost:3001/` + user?.image || "default.jpg"}
-            alt=""
-            className={styles.avatar}
-          />
-         
-              <p>{user.username}</p>
-              <button onClick={handleLogout}>Logout</button>
-              </div>
+              <img src={noticeIcon.src} alt="Notice" />
+            </div>
+
+            <div>
+              <Link href={`/users/${user.id}`} className={styles.userContainer}>
+                <img
+                  src={`http://localhost:3001/` + user?.image || "default.jpg"}
+                  alt=""
+                  className={styles.avatar}
+                />
+                <p>{user.username}</p>
+                <img src={logoutIcon.src} alt="logout" onClick={handleLogout} className={styles.logout} />
               </Link>
+            </div>
+
+
           </>
         ) : (
           <button onClick={() => router.push('/auth')}>Войти</button>

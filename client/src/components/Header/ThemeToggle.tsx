@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { switchThemeLight, switchThemeDark  } from '@/assets';
+
 const ThemeToggle = () => {
   const [theme, setTheme] = useState('light');
 
@@ -17,9 +19,9 @@ const ThemeToggle = () => {
   };
 
   return (
-    <button onClick={toggleTheme}>
-      {theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-    </button>
+    <div onClick={toggleTheme}>
+      {theme === 'light' ? <img src={switchThemeDark.src} alt="Switch To Dark Mode" /> : <img src={switchThemeLight.src} alt="Switch To Light Mode" />}
+    </div>
   );
 };
 

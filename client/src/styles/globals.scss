@@ -45,8 +45,8 @@ header a {
 }
 
 nav {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 7fr 1fr;
   align-items: center;
 }
 
@@ -67,9 +67,9 @@ nav {
 .createPost {
   display: flex;
   flex-direction: column;
-  max-width: 1220px;
+  max-width: 1000px;
   margin: 10px auto;
-  padding: 20px;
+  padding: 10px;
   border-radius: 5px;
   border: 1px solid map-get($light-theme, post-border);
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -84,7 +84,7 @@ nav {
     border: 1px solid map-get($light-theme, post-border);
     color: map-get($light-theme, text);
     position: relative;
-    margin: 10px;
+    margin-top: 10px;
 }
 .post p {
   color: black;
@@ -137,6 +137,15 @@ nav {
   max-width: 20px;
   max-height: 20px;
   z-index: 100;
+}
+
+.userProfile {
+  background-color: map-get($light-theme, post);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid map-get($light-theme, post-border);
+  color: map-get($light-theme, text);
+  display: flex;
 }
 
 body.dark {

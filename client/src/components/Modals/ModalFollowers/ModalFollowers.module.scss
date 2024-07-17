@@ -1,0 +1,19 @@
+.active {
+    background-color: rgb(0, 162, 255);
+}
+.followContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgb(226, 226, 226);
+}
+.followContainer img {
+    margin-right: 5px;
+}
+.avatar {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 100%;
+}

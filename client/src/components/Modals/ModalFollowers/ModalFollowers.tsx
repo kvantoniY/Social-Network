@@ -1,5 +1,6 @@
 import {useState } from 'react'
-
+import styles from './ModalFollowers.module.scss'
+import Link from 'next/link';
 
 interface Follower {
     id: number;
@@ -10,41 +11,46 @@ interface Follower {
 interface ModalFollowersProps {
     followers: Follower[];
     following: Follower[];
+    setIsModalOpen: any;
+    openFollowers: any;
+    setOpenFollowers: any;
 }
 
-const ModalFollowers: React.FC<ModalFollowersProps> = ({ followers, following }) => {
-
-    const [follow, setFollow] = useState(false);
+const ModalFollowers: React.FC<ModalFollowersProps> = ({ followers, following, setIsModalOpen, openFollowers, setOpenFollowers }) => {
 
     return (
         <div>
-            <button onClick={() => setFollow(true)}>Подписки</button>
-            <button onClick={() => setFollow(false)}>Подписчики</button>
-            {follow ? (
+            <button onClick={() => setOpenFollowers(true)} className={openFollowers ? styles.active : ''}>Подписчики</button>
+            <button onClick={() => setOpenFollowers(false)} className={!openFollowers ? styles.active : ''}>Подписки</button>
+            {openFollowers ? (
             <div>
-            Подписчики
+           
             {followers.map(follower => (
-                <div>
-                <p>{follower.username}</p>
+                <Link href={`/users/${follower.id}`} onClick={() => setIsModalOpen(false)}>
+                <div className={styles.followContainer}>
                 <img
                 src={`http://localhost:3001/` + follower?.image || "default.jpg"}
                 alt=""
-                style={{width: '50px', height: '50px'}}
+                className={styles.avatar}
             />
+                            <p>{follower.username}</p>
             </div>
+            </Link>
             ))}
         </div>
             ) : (
-                <div>Подписки
+                <div>
                 {following.map(follower => (
-                    <div>
-                        {follower.username}
+                    <Link href={`/users/${follower.id}`} onClick={() => setIsModalOpen(false)}>
+                    <div className={styles.followContainer}>
                         <img
                             src={`http://localhost:3001/` + follower?.image || "default.jpg"}
                             alt=""
-                            style={{width: '50px', height: '50px'}}
+                            className={styles.avatar}
                         />
+                        <p>{follower.username}</p>
                     </div>
+                    </Link>
                 ))}
             </div>
             )}

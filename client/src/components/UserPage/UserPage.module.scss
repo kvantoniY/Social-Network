@@ -1,0 +1,47 @@
+.userPage {
+    max-width: 1000px;
+    margin: 10px auto;
+    
+}
+.userAboutContainer {
+    position: relative;
+    margin: 20px;
+}
+
+.followContainer {
+    position: relative;
+    margin-top: 20px;
+}
+
+.followContainer p {
+    cursor: pointer;
+    margin-top: 5px;
+}
+.followContainer p:hover {
+    text-decoration: underline;
+}
+
+.editAboutContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.editAboutContainer img {
+    max-width: 15px;
+    max-height: 15px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+.editAboutContainer input {
+    min-height: 31px;
+    margin-right: 5px;
+}
+.editAboutContainer input:focus {
+    outline: none;
+    
+}
+
+.subsContainer {
+    position: absolute;
+    bottom: 1px;
+}
