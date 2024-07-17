@@ -1,0 +1,85 @@
+/* Аватар в посте, модальном окне, комментарии */
+@mixin avatar {
+    grid-area: avatar;
+    display: block;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar {
+    @include avatar;
+
+    &:hover {}
+}
+
+/* Пользователь в посте/комментарии */
+@mixin userContainer {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 0px;
+    column-gap: 10px;
+    align-items: center;
+    grid-template-areas:
+        "avatar username"
+        "avatar date";
+}
+
+.username {
+    grid-area: username;
+}
+
+.date {
+    grid-area: date;
+    font-size: 12px;
+}
+
+@mixin likeComContainer {
+    display: flex;
+    margin-top: 40px;
+}
+
+@mixin likeContainer {
+    padding: 10px;
+    background-color: rgb(206, 206, 206);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.likeContainer p:hover {
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
+@mixin commentsContainer {
+    margin-left: 10px;
+    padding: 10px;
+    background-color: rgb(206, 206, 206);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+.commentsContainer img:hover {
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+/* Пользователь в модальном подписчиков, лайков */
+@mixin followContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgb(226, 226, 226);
+}
+
+.followContainer img {
+    margin-right: 5px;
+}

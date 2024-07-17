@@ -1,21 +1,29 @@
 import { Like } from '@/types/types';
 import React from 'react'
-
+import styles from './ModalLikes.module.scss'
+import Link from 'next/link';
 
 interface ModalLikesProps {
   likes: Like[];
+  setIsModalOpen: any;
 }
 
-const ModalLikes: React.FC<ModalLikesProps> = ({ likes }) => {
+const ModalLikes: React.FC<ModalLikesProps> = ({ likes, setIsModalOpen }) => {
   return (
     <div>
       {likes.length > 0 ? (
         <>
           {likes.map(like => (
-            <div>
-              {like.User?.username}
-
-            </div>
+            <Link href={`/users/${like.User?.id}`} onClick={() => setIsModalOpen(false)}>
+              <div className={styles.followContainer}>
+                <img
+                  src={`http://localhost:3001/` + like.User?.image || "default.jpg"}
+                  alt=""
+                  className={styles.avatar}
+                />
+                <p>{like.User?.username}</p>
+              </div>
+            </Link>
           ))}
         </>
       ) : (

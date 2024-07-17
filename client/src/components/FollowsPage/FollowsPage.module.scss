@@ -1,0 +1,40 @@
+@import '../../styles/mixins';
+
+.switchContainer {
+    margin-top: 10px;
+}
+
+.active {
+    background-color: rgb(184, 229, 255);
+}
+
+.followsPage {
+    max-width: 1000px;
+    margin: 10px auto;
+}
+
+.searchUserContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.searchUserContainer img {
+    max-width: 15px;
+    max-height: 15px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+.searchUserContainer input {
+    min-height: 31px;
+    margin-right: 5px;
+}
+.avatar {
+    @include avatar;
+}
+.followContainer {
+    @include followContainer;
+}
+
+.searchResult {
+    margin-top: 20px;
+}

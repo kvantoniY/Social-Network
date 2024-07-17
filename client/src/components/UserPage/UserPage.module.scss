@@ -1,7 +1,6 @@
 .userPage {
     max-width: 1000px;
     margin: 10px auto;
-    
 }
 .userAboutContainer {
     position: relative;
@@ -37,11 +36,19 @@
     margin-right: 5px;
 }
 .editAboutContainer input:focus {
-    outline: none;
-    
+    outline: none; 
 }
 
 .subsContainer {
     position: absolute;
     bottom: 1px;
+}
+
+.userAvatarContainer img {
+    grid-area: avatar; /* Позиция аватара в сетке */
+    display: block; /* Убираем отступы по умолчанию */
+    width: 245px; /* Задайте ширину */
+    height: 245px; /* Задайте высоту */
+    border-radius: 50%; /* Сделает контейнер круглым */
+    object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
 }

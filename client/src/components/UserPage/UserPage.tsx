@@ -8,7 +8,7 @@ import CreatePost from '@/components/CreatePost/CreatePost';
 import { fetchUserPosts } from '@/features/posts/postsSlice';
 import Post from '@/components/Post/Post';
 import ModalEditAvatar from '@/components/Modals/ModalEditAvatar/ModalEditAvatar';
-import Modal from '@/components/ui/Modal';
+import Modal from '@/components/ui/MyModal/Modal';
 import ModalFollowers from '@/components/Modals/ModalFollowers/ModalFollowers';
 import styles from './UserPage.module.scss';
 import {editIcon} from '@/assets'
@@ -33,7 +33,7 @@ const UserPage = () => {
       setImage(e.target.files[0]);
     }
   };
-
+  
   useEffect(() => {
     if (id) {
       dispatch(fetchUser(Number(id)));
@@ -43,6 +43,12 @@ const UserPage = () => {
       dispatch(searchCurrentFollower(Number(id)));
     }
   }, [dispatch, id]);
+  
+  useEffect(() => {
+    if (user) {
+      setAbout(user.about || '');
+    }
+  }, [user]);
 
   const handleFollow = async () => {
     try {
@@ -127,7 +133,7 @@ const UserPage = () => {
                     <div className={styles.about}>{user.about}</div>
                     {authUser?.id === user.id && (
                     <>
-                        <div>{user.about.length < 1 && <div>Добавить описание</div>}</div>
+                        <div>{user.about?.length < 1 || user.about === null ? <div>Добавить описание</div> : <></>}</div>
                         <img src={editIcon.src} onClick={() => setIsEdit(true)}/>
                     </>
                     )}

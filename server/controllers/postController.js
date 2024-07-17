@@ -103,7 +103,7 @@ exports.getUserPosts = async (req, res) => {
         },
         {
           model: Like,
-          include: [{ model: Post }], // Загружаем лайки к посту и связанные с ними посты
+          include: [{ model: User }], // Загружаем лайки к посту и связанные с ними посты
         },
         {
           model: User,

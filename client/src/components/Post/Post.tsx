@@ -7,7 +7,7 @@ import { fetchUserProfile } from '@/features/auth/authSlice';
 import { fetchUserAPI } from '@/features/users/usersAPI';
 import Comment from '../Comment/Comment';
 import Link from 'next/link';
-import Modal from '../ui/Modal';
+import Modal from '@/components/ui/MyModal/Modal';
 import PostModal from '../Modals/ModalPost/ModalPost';
 import { Post as PostType, Comment as CommentType } from '../../types/types';
 import ModalLikes from '../Modals/ModalLikes/ModalLikes';
@@ -170,7 +170,7 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
         isOpen={isModalLikesOpen}
         setIsModalOpen={setIsModalLikesOpen}
       >
-        <ModalLikes likes={post.Likes}/>
+        <ModalLikes likes={post.Likes} setIsModalOpen={setIsModalLikesOpen}/>
       </Modal>
     </div>
   );

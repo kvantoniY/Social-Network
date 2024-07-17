@@ -1,7 +1,7 @@
 // src/components/PostModal.tsx
 import React from 'react';
 import styles from './ModalPost.module.scss';
-import {closeModal} from '../../assets/'
+import {closeModal} from '@/assets/'
 
 interface ModalProps {
   isOpen: boolean;

@@ -83,10 +83,7 @@ const postsSlice = createSlice({
       })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.posts = action.payload.map((post: Post) => ({
-          ...post,
-          likeStatus: post.likeStatus || false,
-        }));
+        state.posts = action.payload;
       })
       .addCase(fetchUserPosts.rejected, (state, action) => {
         state.status = 'failed';

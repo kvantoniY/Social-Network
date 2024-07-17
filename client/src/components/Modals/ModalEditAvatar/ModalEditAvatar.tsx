@@ -1,4 +1,4 @@
-import { fetchLikes, fetchComments, deleteComment, createComment, fetchPosts } from '@/features/posts/postsSlice';
+import { deleteComment, createComment, fetchPosts, fetchUserPosts } from '@/features/posts/postsSlice';
 import { RootState, AppDispatch } from '../../../store/store';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,6 +33,7 @@ const ModalEditAvatar: React.FC<ModalEditAvatarProps> = ({user}) => {
       await dispatch(editUserAvatar(formData))
       dispatch(fetchUserProfile())
       dispatch(fetchUser(Number(id)))
+      dispatch(fetchUserPosts(Number(id)))
     } catch (e) {
       console.log(e)
     }

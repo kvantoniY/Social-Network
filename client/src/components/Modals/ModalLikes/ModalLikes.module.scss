@@ -1,9 +1,5 @@
 @import '../../../styles/mixins';
 
-.active {
-    background-color: rgb(184, 229, 255);
-}
-
 .followContainer {
     @include followContainer
 }
