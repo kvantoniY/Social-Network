@@ -41,7 +41,7 @@ const handleDeleteComment = async (postId: number, commentId: number) => {
 
   return (
     <div className='post'>
-    <Link href={`/users/${post.User?.id}`}>
+    <Link href={`/users/${post.User?.id}`} onClick={() => setIsModalLikesOpen(false)}>
       <div className={styles.userContainer}>
         <img
           src={`http://localhost:3001/` + post.User?.image || "default.jpg"}
@@ -91,7 +91,13 @@ const handleDeleteComment = async (postId: number, commentId: number) => {
     <div>
       {post.Comments?.length > 0 ? (
           post.Comments.map(comment => (
-            <Comment comment={comment} key={comment?.id} authUser={authUser} post={post} handleDeleteComment={handleDeleteComment}/>
+            <Comment 
+            comment={comment} 
+            key={comment?.id} 
+            authUser={authUser} 
+            post={post} 
+            handleDeleteComment={handleDeleteComment}
+            setIsModalLikesOpen={setIsModalLikesOpen}/>
           ))
         ) : (
           <></>

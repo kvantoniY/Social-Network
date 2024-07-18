@@ -16,9 +16,10 @@ interface CommentProps {
       } | null;
     post: Post;
     handleDeleteComment: (postId: number, commentId: number) => void;
+    setIsModalLikesOpen: any;
   }
 
-const Comment: React.FC<CommentProps> = ({comment, authUser, post, handleDeleteComment}) => {
+const Comment: React.FC<CommentProps> = ({comment, authUser, post, handleDeleteComment, setIsModalLikesOpen}) => {
   const isoDateString = comment.createdAt;
 const dateObject = new Date(isoDateString);
 
@@ -36,7 +37,7 @@ const minutes = dateObject.getMinutes().toString().padStart(2, '0'); // Доба
 const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
   return (
     <div className='comment'>
-            <Link href={`/users/${comment.User?.id}`}>
+            <Link href={`/users/${comment.User?.id}`} onClick={() => setIsModalLikesOpen(false)}>
            <div className={styles.userContainer}>
             <img
             src={`http://localhost:3001/` + comment.User?.image || "default.jpg"}

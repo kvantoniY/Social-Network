@@ -147,6 +147,7 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
               authUser={authUser}
               post={post}
               handleDeleteComment={handleDeleteComment}
+              setIsModalLikesOpen={setIsModalLikesOpen}
             />
              <p onClick={() => setIsModalOpen(true)} className={styles.showMoreComments}>Показать все комментарии...</p>
           </>
