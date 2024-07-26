@@ -7,7 +7,7 @@ export const checkToken = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        await axiosInstance.get('/api/auth/checkToken', {
+        await axiosInstance.get('/auth/checkToken', {
           headers: { Authorization: `Bearer ${token}` },
         });
         dispatch(setToken(token));

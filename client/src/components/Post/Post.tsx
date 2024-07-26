@@ -97,7 +97,6 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
             alt=""
             className={styles.avatar}
           />
-          <div></div>
           <p className={styles.username}>{post.User?.username}</p>
           <p className={styles.date}>{formattedDate}</p>
         </div>

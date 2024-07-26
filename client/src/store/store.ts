@@ -3,6 +3,7 @@ import authReducer from '../features/auth/authSlice';
 import postsReducer from '../features/posts/postsSlice';
 import usersReducer from '../features/users/usersSlice';
 import followSlice from '../features/follows/followSlice';
+import dialogsSlice from '@/features/dialogs/dialogsSlice';
 
 
 
@@ -12,6 +13,7 @@ export const store = configureStore({
     posts: postsReducer,
     users: usersReducer,
     follows: followSlice,
+    dialogs: dialogsSlice
   },
 });
 

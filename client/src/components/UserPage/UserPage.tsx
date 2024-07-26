@@ -12,6 +12,7 @@ import Modal from '@/components/ui/MyModal/Modal';
 import ModalFollowers from '@/components/Modals/ModalFollowers/ModalFollowers';
 import styles from './UserPage.module.scss';
 import {editIcon} from '@/assets'
+import Link from 'next/link';
 
 const UserPage = () => {
   const router = useRouter();
@@ -145,7 +146,12 @@ const UserPage = () => {
               <div className={styles.subsContainer}>
                 {followStatus === 0 && <button onClick={handleFollow}>Подписаться</button>}
                 {followStatus === 2 && <button onClick={handleFollow}>Подписаться в ответ</button>}
-                {followStatus === 3 && <button onClick={handleUnFollow}>Отписаться</button>}
+                {followStatus === 3 && (
+                  <div>
+                    <button onClick={handleUnFollow}>Отписаться</button>
+                    <Link href={`/dialogs/${user.id}`}>Написать</Link>
+                  </div>
+                )}
                 {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
               </div>
             )}

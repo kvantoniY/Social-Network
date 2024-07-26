@@ -1,0 +1,15 @@
+@import '../../styles/mixins';
+
+.followContainer {
+    @include followContainer;
+}
+
+.dialogList {
+    max-width: 1000px;
+    margin: 0px auto;
+    margin-top: 60px;
+}
+
+.avatar {
+    @include avatar;
+}
