@@ -26,7 +26,7 @@ const DialogsList: React.FC = () => {
     if (user) {
       const newSocket = io(':3001');
       setSocket(newSocket);
-
+      newSocket.emit('join', user.id); // Присоединение к комнате пользователя
       newSocket.on('dialogs update', (updatedDialogs: Dialog[]) => {
         setDialogs(updatedDialogs);
       });

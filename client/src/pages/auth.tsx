@@ -55,6 +55,7 @@ const AuthPage = () => {
 
   return (
     <div>
+      <br /><br /><br /><br />
       <h2>{isRegistering ? 'Регистрация' : 'Вход'}</h2>
       <form onSubmit={handleSubmit}>
         {isRegistering && (

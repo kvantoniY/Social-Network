@@ -4,7 +4,7 @@ const Dialog = require('./models/Dialog');
 const User = require('./models/User');
 const path = require('path');
 const fs = require('fs');
-
+const { Op } = require('sequelize');
 const socketHandler = (server) => {
   const io = new Server(server, {
     cors: {
@@ -17,6 +17,11 @@ const socketHandler = (server) => {
 
   io.on('connection', (socket) => {
     console.log('a user connected');
+
+    socket.on('join', (userId) => {
+      socket.join(userId);
+      console.log(`User ${userId} joined room ${userId}`);
+    });
 
     socket.on('chat message', async (msg) => {
       try {
@@ -59,16 +64,23 @@ const socketHandler = (server) => {
           ]
         });
 
-        io.emit('chat message', messageWithUsers);
+        io.to(receiverId).emit('chat message', messageWithUsers);
+        io.to(senderId).emit('chat message', messageWithUsers);
 
-        const dialogs = await Dialog.findAll({
-          where: { userId2: receiverId },
-          include: [
-            { model: User, as: 'User1' },
-            { model: User, as: 'User2' }
-          ]
-        });
-        io.emit('dialogs update', dialogs);
+        const updateDialogs = async (userId) => {
+          const dialogs = await Dialog.findAll({
+            where: { userId2: userId },
+            include: [
+              { model: User, as: 'User1' },
+              { model: User, as: 'User2' }
+            ]
+          });
+          io.to(userId).emit('dialogs update', dialogs);
+        }
+
+        updateDialogs(receiverId);
+        updateDialogs(senderId);
+        
       } catch (error) {
         console.error('Error handling chat message:', error);
       }
@@ -84,29 +96,82 @@ const socketHandler = (server) => {
           ]
         });
 
-        socket.emit('dialogs update', dialogs);
+        io.to(userId).emit('dialogs update', dialogs);
       } catch (error) {
         console.error('Error fetching dialogs:', error);
+      }
+    });
+
+    socket.on('get messages', async (userId, otherUserId) => {
+      console.log(userId, otherUserId)
+      try {
+        const messages = await Message.findAll({
+          where: {
+            [Op.or]: [
+              { senderId: userId, receiverId: otherUserId },
+              { senderId: otherUserId, receiverId: userId }
+            ]
+          },
+          include: [
+            { model: User, as: 'Sender' },
+            { model: User, as: 'Receiver' }
+          ],
+          order: [['createdAt', 'ASC']]
+        });
+    
+        // Выполнение обновления сообщений и диалога после отправки ответа
+        await Message.update(
+          { read: true },
+          {
+            where: {
+              receiverId: userId,
+              senderId: otherUserId,
+              read: false,
+            },
+          }
+        );
+    
+        let dialog = await Dialog.findOne(
+          {where: { userId1: otherUserId, userId2: userId }}
+        );
+    
+        if (dialog) {
+          dialog.unreadCount = 0;
+          await dialog.save();
+        }
+        const dialogs = await Dialog.findAll({
+          where: { userId2: userId },
+          include: [
+            { model: User, as: 'User1' },
+            { model: User, as: 'User2' }
+          ]
+        });
+
+        io.to(userId).emit('dialogs update', dialogs);
+        io.to(userId).emit('get messages', messages);
+      } catch (error) {
+        console.log(error)
       }
     });
 
     socket.on('disconnect', () => {
       console.log('user disconnected');
     });
+
     socket.on('delete message', async (messageId, userId) => {
       try {
-        console.log(messageId)
+        console.log(messageId);
         const message = await Message.findOne({ where: { id: messageId } });
         if (message && message.senderId === userId) {
           await message.destroy();
-          io.emit('delete message', message);
+          io.to(message.receiverId).emit('delete message', message);
+          io.to(message.senderId).emit('delete message', message);
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-    })
+    });
   });
-
 
   return io;
 };

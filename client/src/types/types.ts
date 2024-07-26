@@ -52,3 +52,11 @@ export interface User {
     updatedAt: string;
     image: any;
   }
+  export interface Dialog {
+    id: number;
+    userId1: number;
+    userId2: number;
+    unreadCount: number;
+    User1: User;
+    User2: User;
+  }

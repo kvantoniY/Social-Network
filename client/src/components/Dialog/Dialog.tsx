@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useRouter } from 'next/router';
 import axiosInstance from '@/utils/axiosInstance';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import styles from './Dialog.module.scss';
 import { fetchUser } from '@/features/users/usersSlice';
 import Link from 'next/link';
 import { deleteIconMini, deleteIcon } from '../../assets/';
+import { fetchUserProfile } from '@/features/auth/authSlice';
 
 interface Message {
   id: number;
@@ -39,15 +40,17 @@ const Dialog: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && user) {
+      dispatch(fetchUser(Number(userId)));
       const newSocket = io(':3001');
       setSocket(newSocket);
-      dispatch(fetchUser(Number(userId)));
+      newSocket.emit('join', user?.id); // Присоединение к комнате пользователя
       const fetchSocketMessages = async () => {
         try {
-          const response = await axiosInstance.get(`/messages/${id}`);
-          setSocketMessages(response.data);
-
+          newSocket.on('get messages', (msg: Message[]) => {
+            setSocketMessages(msg);
+            scrollToBottom();
+          });
           newSocket.on('chat message', (msg: Message) => {
             setSocketMessages((msgs: any) => [...msgs, msg]);
             scrollToBottom();
@@ -60,6 +63,7 @@ const Dialog: React.FC = () => {
               return updatedMessages;
             });
           });
+          newSocket.emit('get messages', Number(user?.id), Number(id));
         } catch (e) {
           console.log(e);
         }
@@ -69,7 +73,10 @@ const Dialog: React.FC = () => {
 
       return () => {
         if (newSocket) {
+          newSocket.off('get messages');
           newSocket.off('chat message');
+          newSocket.off('delete message');
+          newSocket.close();
         }
       };
     }
