@@ -27,7 +27,6 @@ interface Message {
 const Dialog: React.FC = () => {
   const router = useRouter();
   const { userId } = router.query;
-  const id = userId as string;
   const [newMessage, setNewMessage] = useState<string>('');
   const user = useSelector((state: RootState) => state.auth.user);
   const dialogUser = useSelector((state: RootState) => state.users.user);
@@ -40,11 +39,12 @@ const Dialog: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (id && user) {
+    if (userId && user) {
       dispatch(fetchUser(Number(userId)));
       const newSocket = io(':3001');
       setSocket(newSocket);
       newSocket.emit('join', user?.id); // Присоединение к комнате пользователя
+      newSocket.emit('open dialog', Number(userId)); // Сообщаем серверу об открытии диалога
       const fetchSocketMessages = async () => {
         try {
           newSocket.on('get messages', (msg: Message[]) => {
@@ -63,7 +63,7 @@ const Dialog: React.FC = () => {
               return updatedMessages;
             });
           });
-          newSocket.emit('get messages', Number(user?.id), Number(id));
+          newSocket.emit('get messages', Number(user?.id), Number(userId));
         } catch (e) {
           console.log(e);
         }
@@ -72,7 +72,9 @@ const Dialog: React.FC = () => {
       fetchSocketMessages();
 
       return () => {
+        
         if (newSocket) {
+          newSocket.emit('close dialog', Number(userId)); // Сообщаем серверу о закрытии диалога
           newSocket.off('get messages');
           newSocket.off('chat message');
           newSocket.off('delete message');
@@ -80,7 +82,7 @@ const Dialog: React.FC = () => {
         }
       };
     }
-  }, [id, dispatch, userId]);
+  }, [dispatch, userId, user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -99,7 +101,7 @@ const Dialog: React.FC = () => {
     reader.onloadend = () => {
       const messageData = {
         content: newMessage,
-        receiverId: Number(id),
+        receiverId: Number(userId),
         senderId: user?.id,
         image: image ? reader.result : null,
       };
@@ -117,7 +119,7 @@ const Dialog: React.FC = () => {
     } else {
       const messageData = {
         content: newMessage,
-        receiverId: Number(id),
+        receiverId: Number(userId),
         senderId: user?.id,
       };
       socket.emit('chat message', messageData);

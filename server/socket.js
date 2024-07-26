@@ -15,32 +15,44 @@ const socketHandler = (server) => {
     }
   });
 
+  const activeDialogs = new Map(); // добавьте это в начало файла для хранения активных диалогов пользователей
+
   io.on('connection', (socket) => {
     console.log('a user connected');
-
+  
     socket.on('join', (userId) => {
       socket.join(userId);
       console.log(`User ${userId} joined room ${userId}`);
     });
+  
+    socket.on('open dialog', (userId) => {
+      activeDialogs.set(userId, true); // добавляем диалог в активные при открытии
+      console.log(`open dialog, status active user: ${activeDialogs.has(userId)}`)
+    });
 
+    socket.on('close dialog', (userId) => {
+      activeDialogs.delete(userId); // удаляем диалог из активных при закрытии'
+      console.log(`close dialog, status active user: ${activeDialogs.has(userId)}`)
+    });
+  
     socket.on('chat message', async (msg) => {
       try {
         const { content, receiverId, senderId, image } = msg;
-
+  
         let dialog = await Dialog.findOne({
           where: { userId1: senderId, userId2: receiverId }
         });
         let secondDialog = await Dialog.findOne({
           where: { userId1: receiverId, userId2: senderId }
         });
-
+  
         if (!dialog) {
           dialog = await Dialog.create({ userId1: senderId, userId2: receiverId });
         }
         if (!secondDialog) {
           secondDialog = await Dialog.create({ userId1: receiverId, userId2: senderId });
         }
-
+  
         let imageUrl = null;
         if (image) {
           const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
@@ -50,12 +62,14 @@ const socketHandler = (server) => {
           fs.writeFileSync(imagePath, buffer);
           imageUrl = imageName;
         }
-
+  
         let message = await Message.create({ content, senderId, receiverId, image: imageUrl });
-
-        dialog.unreadCount += 1;
-        await dialog.save();
-
+        console.log(`receiverId: ${receiverId}, activeDialogsReceiverId: ${activeDialogs.get(receiverId)}, activeDialogsSenderId: ${activeDialogs.get(senderId)}`)
+         if (!activeDialogs.has(senderId)) {
+          dialog.unreadCount += 1;
+          await dialog.save();
+        }
+  
         const messageWithUsers = await Message.findOne({
           where: { id: message.id },
           include: [
@@ -63,10 +77,10 @@ const socketHandler = (server) => {
             { model: User, as: 'Receiver' }
           ]
         });
-
+  
         io.to(receiverId).emit('chat message', messageWithUsers);
         io.to(senderId).emit('chat message', messageWithUsers);
-
+  
         const updateDialogs = async (userId) => {
           const dialogs = await Dialog.findAll({
             where: { userId2: userId },
@@ -77,10 +91,10 @@ const socketHandler = (server) => {
           });
           io.to(userId).emit('dialogs update', dialogs);
         }
-
+  
         updateDialogs(receiverId);
         updateDialogs(senderId);
-        
+  
       } catch (error) {
         console.error('Error handling chat message:', error);
       }
@@ -160,7 +174,6 @@ const socketHandler = (server) => {
 
     socket.on('delete message', async (messageId, userId) => {
       try {
-        console.log(messageId);
         const message = await Message.findOne({ where: { id: messageId } });
         if (message && message.senderId === userId) {
           await message.destroy();

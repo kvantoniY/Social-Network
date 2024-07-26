@@ -17,7 +17,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
   const [dialogs, setDialogs] = useState<Dialog[]>([]);
-
+  const [unreadCount, setUnreadCount] = useState(0);
   useEffect(() => {
     dispatch(checkToken() as any);
     dispatch(fetchUserProfile())
@@ -30,6 +30,8 @@ const Header: React.FC = () => {
 
       newSocket.on('dialogs update', (updatedDialogs: Dialog[]) => {
         setDialogs(updatedDialogs);
+        const totalUnreadCount = updatedDialogs.reduce((acc, dialog) => acc + dialog.unreadCount, 0);
+        setUnreadCount(totalUnreadCount); // Обновляем общее количество непрочитанных сообщений
       });
 
       // Запрос на получение текущих диалогов
@@ -55,11 +57,7 @@ const Header: React.FC = () => {
             <div className={styles.navMenu}>
               <Link href="/feed"><img src={homeIcon.src} alt="Feed" /></Link>
               <Link href="/dialogs"><img src={dialogsIcon.src} alt="dialogs" /></Link>
-              {dialogs.map(dialog => (
-                <div>
-                  {dialog.unreadCount !== 0 ? <div>({dialog.unreadCount})</div> : <div></div>}
-                </div>
-        ))}
+              {unreadCount}
               <Link href="/follows"><img src={subsIcon.src} alt="Subs" /></Link>
               <ThemeToggle />
 
