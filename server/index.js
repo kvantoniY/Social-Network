@@ -32,7 +32,7 @@ const server = http.createServer(app);
 socketHandler(server);
 
 // Sync database and start server
-sequelize.sync()
+sequelize.sync() 
   .then(result => {
     console.log(result);
     server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

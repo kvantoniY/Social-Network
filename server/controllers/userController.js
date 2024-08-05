@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const BlackList = require('../models/BlackList');
 const uuid = require("uuid");
 const path = require("path");
 
@@ -81,3 +82,15 @@ exports.editUser = async (req, res) => {
    res.status(200).json(about);
 };
 
+exports.blackListUsers = async (req, res) => {
+  const { userId } = req.body 
+  try {
+    const blUser = await BlackList.findOne({ where: { blUserId: req.userId, userId: userId } });
+    if (!blUser) {
+      return res.status(404).json({ error: 'No blacklist' });
+    }
+    res.status(200).json(blUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

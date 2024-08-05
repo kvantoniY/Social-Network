@@ -29,6 +29,12 @@ export interface User {
     userId: number;
     User: User;
   }
+  export interface LikeCom {
+    id: number;
+    commentId: number;
+    userId: number;
+    User: User;
+  }
   
   export interface Comment {
     id: number;
@@ -38,6 +44,8 @@ export interface User {
     createdAt: string;
     updatedAt: string;
     User: User;
+    LikeCom: LikeCom[];
+    likeStatus: boolean;
   }
   
   export interface Post {
@@ -56,7 +64,20 @@ export interface User {
     id: number;
     userId1: number;
     userId2: number;
+    dialogId: number;
     unreadCount: number;
     User1: User;
     User2: User;
+  }
+  export interface Notification {
+    id: number;
+    type: string;
+    message: string;
+    userId: number;
+    actorId: number;
+    postId?: number;
+    isRead: boolean;
+    User: User;
+    Actor: User;
+    Post?: Post;
   }

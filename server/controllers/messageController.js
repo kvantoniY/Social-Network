@@ -119,3 +119,46 @@ exports.getDialogs = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getDialog = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const {id} = req.body;
+    let dialog = await Dialog.findOne({
+      where: { userId1: userId, userId2: id }
+    });
+
+    console.log(`dialog: ${dialog}`)
+    res.status(200).json(dialog);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.checkDialogs = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { dialogId, dialogUserId } = req.body;
+    console.log(`----- ${dialogId} ----- ${userId} ------ ${dialogUserId}`)
+    // Проверка прав пользователя
+    const dialog = await Dialog.findOne({
+      where: {
+        dialogId,
+        [Op.or]: [{ userId1: userId }, { userId2: dialogUserId }],
+      },
+    });
+    const secondDialog = await Dialog.findOne({
+      where: {
+        dialogId,
+        [Op.or]: [{ userId1: dialogUserId }, { userId2: userId }],
+      },
+    });
+
+    if (!dialog || !secondDialog) {
+      return res.status(403).json({ error: 'Unauthorized access to dialog' });;
+    }
+    res.status(200).json(dialog);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

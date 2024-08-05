@@ -11,6 +11,8 @@ import { fetchUser } from '@/features/users/usersSlice';
 import Link from 'next/link';
 import { deleteIconMini, deleteIcon } from '../../assets/';
 import { fetchUserProfile } from '@/features/auth/authSlice';
+import { useSearchParams } from 'next/dist/client/components/navigation';
+
 
 interface Message {
   id: number;
@@ -27,6 +29,8 @@ interface Message {
 const Dialog: React.FC = () => {
   const router = useRouter();
   const { userId } = router.query;
+  const searchParams = useSearchParams();
+  const dialogId = searchParams.get('dialog')
   const [newMessage, setNewMessage] = useState<string>('');
   const user = useSelector((state: RootState) => state.auth.user);
   const dialogUser = useSelector((state: RootState) => state.users.user);
@@ -44,7 +48,7 @@ const Dialog: React.FC = () => {
       const newSocket = io(':3001');
       setSocket(newSocket);
       newSocket.emit('join', user?.id); // Присоединение к комнате пользователя
-      newSocket.emit('open dialog', Number(userId)); // Сообщаем серверу об открытии диалога
+      newSocket.emit('open dialog', Number(user.id), Number(userId)); // Сообщаем серверу об открытии диалога
       const fetchSocketMessages = async () => {
         try {
           newSocket.on('get messages', (msg: Message[]) => {
@@ -63,7 +67,7 @@ const Dialog: React.FC = () => {
               return updatedMessages;
             });
           });
-          newSocket.emit('get messages', Number(user?.id), Number(userId));
+          newSocket.emit('get messages', Number(user?.id), Number(userId), Number(dialogId));
         } catch (e) {
           console.log(e);
         }
@@ -74,7 +78,7 @@ const Dialog: React.FC = () => {
       return () => {
         
         if (newSocket) {
-          newSocket.emit('close dialog', Number(userId)); // Сообщаем серверу о закрытии диалога
+          newSocket.emit('close dialog', Number(user.id), Number(userId)); // Сообщаем серверу о закрытии диалога
           newSocket.off('get messages');
           newSocket.off('chat message');
           newSocket.off('delete message');
@@ -82,7 +86,7 @@ const Dialog: React.FC = () => {
         }
       };
     }
-  }, [dispatch, userId, user]);
+  }, [dispatch, userId, user, dialogId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -96,7 +100,7 @@ const Dialog: React.FC = () => {
   const sendSocketMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() && !image) return;
-
+    console.log(dialogId)
     const reader = new FileReader();
     reader.onloadend = () => {
       const messageData = {
@@ -104,6 +108,7 @@ const Dialog: React.FC = () => {
         receiverId: Number(userId),
         senderId: user?.id,
         image: image ? reader.result : null,
+        dialogId: Number(dialogId)
       };
       socket.emit('chat message', messageData);
       setNewMessage('');
@@ -121,6 +126,7 @@ const Dialog: React.FC = () => {
         content: newMessage,
         receiverId: Number(userId),
         senderId: user?.id,
+        dialogId: Number(dialogId)
       };
       socket.emit('chat message', messageData);
       setNewMessage('');
@@ -144,7 +150,7 @@ const Dialog: React.FC = () => {
 
   const handleDeleteMessage = (messageId: number) => {
     try {
-      socket.emit('delete message', messageId, user?.id);
+      socket.emit('delete message', messageId, user?.id, dialogUser?.id);
     } catch (e) {
       console.log(e)
     }
@@ -161,7 +167,7 @@ const Dialog: React.FC = () => {
       </Link>
       <div className='messageContainer'>
         {socketMessages.map(message => (
-          <div key={message.id} className={styles.userContainer}>
+          <div key={message.id} className={`${styles.userContainer} ${message.read === false ? styles.unread : ''}`}>
             <div className={styles.userDetails}>
               <Link href={`/users/${message.Sender?.id}`}>
                 <img
@@ -180,7 +186,7 @@ const Dialog: React.FC = () => {
                   <p className={styles.date}>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
                 <div className={styles.messageContents}>
-                <p className={styles.message}>{message.content}</p>
+                <p className={styles.message}>{message.content}</p>{message.read ? 'true' : "false"}
                 {message.image && <img src={`http://localhost:3001/${message.image}`} alt="message image" className={styles.messageImage} />}
                 </div>
               </div>

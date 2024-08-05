@@ -1,12 +1,14 @@
 const Comment = require('../models/Comment');
-const Like = require('../models/Like');
+const LikeCom = require('../models/LikeCom');
 const Post = require('../models/Post');
 const User = require('../models/User');
 
 exports.fetchComments = async (req, res) => {
     try {
         const postId = req.params.postId;
-        const comments = await Comment.findAll({where: {postId: postId}});
+        const comments = await Comment.findAll({
+            where: {postId: postId},
+        });
       
         res.status(201).json({comments, postId});
     } catch (error) {
@@ -48,4 +50,87 @@ exports.deleteComment = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+};
+
+exports.addLike = async (req, res) => {
+  try {
+    const checkLike = await LikeCom.findOne({
+      where: { commentId: req.params.commentId, userId: req.userId },
+    });
+    const findComment = await Comment.findOne({
+        where: { id: req.params.commentId, userId: req.userId },
+      });
+
+    const postId = findComment.postId;
+
+    if (checkLike) {
+      return res.status(404).json({ message: "Лайк уже стоит" });
+    }
+    const addLike = await LikeCom.create({
+      commentId: req.params.commentId,
+      userId: req.userId,
+    });
+
+    const commentId = req.params.commentId;
+    // Найдите пользователя, чтобы вернуть его вместе с комментарием
+    const user = await User.findByPk(req.userId);
+    const newLike = await LikeCom.findOne({
+        where: { commentId: req.params.commentId, userId: req.userId },
+      });
+      console.log(`NEW LIKE: ${newLike}`)
+    const like = {
+      ...addLike.dataValues,
+      User: user, // Добавьте пользователя к комментарию
+      LikeCom: newLike
+    };
+
+    console.log(like, commentId, postId)
+    res.status(201).json({ like, commentId, postId});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.removeLike = async (req, res) => {
+  try {
+    const like = await LikeCom.findOne({
+      where: { commentId: req.params.commentId, userId: req.userId },
+    });
+    if (!like) {
+      return res.status(404).json({ message: "LikeCom not found" });
+    }
+    const findComment = await Comment.findOne({
+        where: { id: req.params.commentId, userId: req.userId },
+      });
+    
+    const postId = findComment.postId;
+    
+    await like.destroy();
+    const commentId = req.params.commentId;
+    const userId = req.userId;
+    res.status(200).json({ like, commentId, userId, postId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.fetchLikes = async (req, res) => {
+  try {
+    const allLikes = await LikeCom.findAll({
+      where: { commentId: req.params.commentId },
+    });
+    const like = await LikeCom.findOne({
+      where: { commentId: req.params.commentId, userId: req.userId },
+    });
+    let myLikeStatus = false;
+    if (like) {
+      myLikeStatus = true;
+    } else {
+      myLikeStatus = false;
+    }
+    const commentId = req.params.commentId;
+    res.status(200).json({ myLikeStatus });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

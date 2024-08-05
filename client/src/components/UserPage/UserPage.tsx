@@ -13,21 +13,26 @@ import ModalFollowers from '@/components/Modals/ModalFollowers/ModalFollowers';
 import styles from './UserPage.module.scss';
 import {editIcon} from '@/assets'
 import Link from 'next/link';
+import io from 'socket.io-client';
+import axiosInstance from '@/utils/axiosInstance';
+import { Dialog } from '@/types/types';
 
 const UserPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  let { id } = router.query;
+
   const dispatch = useDispatch<AppDispatch>();
   const { user, status, error } = useSelector((state: RootState) => state.users);
   const { followStatus, followers, following } = useSelector((state: RootState) => state.follows);
   const { posts } = useSelector((state: RootState) => state.posts);
   const authUser = useSelector((state: RootState) => state.auth.user);
-
+  const [dialogId, setDialogId] = useState(null);
   const [about, setAbout] = useState('');
   const [image, setImage] = useState<any>(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFollowersOpen, setIsModalFollowersOpen] = useState(false);
+  const [socket, setSocket] = useState<any>(null);
 
   const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -37,11 +42,27 @@ const UserPage = () => {
   
   useEffect(() => {
     if (id) {
+      const numericId = Number(id);
       dispatch(fetchUser(Number(id)));
       dispatch(fetchUserPosts(Number(id)));
       dispatch(searchFollowers(Number(id)));
       dispatch(searchFollowing(Number(id)));
       dispatch(searchCurrentFollower(Number(id)));
+      const findDialogId = async () => {
+        try {
+          const response = await axiosInstance.post('/messages/dialog', { id: numericId })
+          if (response.data) {
+            setDialogId(response.data.dialogId)
+          } else {
+
+          }
+          console.log("resp data null")
+        } catch (e) {
+          console.log(e)
+        }
+        console.log(dialogId)
+      }
+      findDialogId();
     }
   }, [dispatch, id]);
   
@@ -51,9 +72,27 @@ const UserPage = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (authUser) {
+      const newSocket = io(':3001');
+      setSocket(newSocket);
+      newSocket.emit('join', authUser?.id); // Присоединение к комнате пользователя
+
+      return () => {
+        newSocket.close();
+      };
+    }
+  }, [authUser]);
+
   const handleFollow = async () => {
     try {
       await dispatch(follow(Number(id)));
+      const notificationData = {
+        type: 'follow',
+        userId: Number(id),
+        actorId: Number(authUser?.id),
+      };
+      socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
     } catch (e) {
       console.log(e);
     }

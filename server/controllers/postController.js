@@ -4,6 +4,7 @@ const User = require("../models/User");
 const Comment = require("../models/Comment");
 const uuid = require("uuid");
 const path = require("path");
+const LikeCom = require("../models/LikeCom");
 
 exports.createPost = async (req, res) => {
   try {
@@ -65,7 +66,7 @@ exports.getPosts = async (req, res) => {
           include: [
             {
               model: Comment,
-              include: [{ model: User }], // Загружаем комментарии к посту и связанных с ними пользователей
+              include: [{ model: User }, {model: LikeCom}], // Загружаем комментарии к посту и связанных с ними пользователей
             },
             {
               model: Like,
@@ -99,7 +100,7 @@ exports.getUserPosts = async (req, res) => {
       include: [
         {
           model: Comment,
-          include: [{ model: User }], // Загружаем комментарии к посту и связанных с ними пользователей
+          include: [{ model: User }, {model: LikeCom}], // Загружаем комментарии к посту и связанных с ними пользователей
         },
         {
           model: Like,

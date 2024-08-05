@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Post, Comment as CommentType, User, Like } from '../../types/types';
-import {deleteIcon} from '../../assets/'; // Импортируем иконку
+import {deleteIcon, likeIcon, unLikeIcon} from '../../assets/'; // Импортируем иконку
 
 interface CommentProps {
     comment: CommentType;
@@ -16,10 +16,11 @@ interface CommentProps {
       } | null;
     post: Post;
     handleDeleteComment: (postId: number, commentId: number) => void;
+    handleLikeComment: (commentId: number, userId: number) => void
     setIsModalLikesOpen: any;
   }
 
-const Comment: React.FC<CommentProps> = ({comment, authUser, post, handleDeleteComment, setIsModalLikesOpen}) => {
+const Comment: React.FC<CommentProps> = ({comment, authUser, post, handleDeleteComment, setIsModalLikesOpen, handleLikeComment}) => {
   const isoDateString = comment.createdAt;
 const dateObject = new Date(isoDateString);
 
@@ -50,6 +51,16 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
           </Link>
           
           <p className={styles.postContent}>{comment?.content}</p>
+          <div className={styles.likeContainer}>
+          {comment.likeStatus ? (
+            <img src={likeIcon.src} alt="like"  onClick={() => handleLikeComment(comment.id, comment.userId)} className={styles.likeButton}/>
+          ) : (
+            <img src={unLikeIcon.src} alt="unlike"  onClick={() => handleLikeComment(comment.id, comment.userId)} className={styles.likeButton}/>
+            )}
+          <p onClick={() => setIsModalLikesOpen(true)}>
+            {comment.LikeCom ? comment.LikeCom?.length : 0}
+          </p>
+        </div>
           {authUser?.id === comment?.userId || authUser?.id === post.userId ? (
            <img src={deleteIcon.src} onClick={() => handleDeleteComment(post.id, comment.id)} className={styles.deleteButton} alt="Delete"/>
           ) : (

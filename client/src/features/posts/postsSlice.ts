@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI, createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI, fetchCommentsAPI, fetchLastCommentAPI } from './postsAPI';
+import { fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI, createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI, fetchCommentsAPI, fetchLastCommentAPI, createLikeCommentAPI, deleteLikeCommentAPI } from './postsAPI';
 
 import { Post, User, Comment, Like } from '../../types/types';
 
@@ -54,6 +54,16 @@ export const createComment = createAsyncThunk('posts/createComment', async ({ po
 // Удаление коммента
 export const deleteComment = createAsyncThunk('posts/deleteComment', async ({ postId, commentId }: { postId: number; commentId: number }) => {
   const response = await deleteCommentAPI(postId, commentId);
+  return response
+});
+// Создание лайка
+export const createLikeComment = createAsyncThunk('posts/createLikeComment', async (commentId: number) => {
+  const response = await createLikeCommentAPI(commentId);
+  return response
+});
+// Удаление лайка
+export const deleteLikeComment = createAsyncThunk('posts/deleteLikeComment', async (commentId: number) => {
+  const response = await deleteLikeCommentAPI(commentId);
   return response
 });
 
@@ -183,6 +193,46 @@ const postsSlice = createSlice({
         };
       })
       .addCase(deleteComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || null;
+      })
+
+      // Создание лайка
+      .addCase(createLikeComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createLikeComment.fulfilled, (state, action: any) => {
+        state.status = 'succeeded';
+        const { commentId, postId, like } = action.payload;
+          const post = state.posts.find(post => post.id == postId);
+          const comment = post?.Comments.find(comment => comment.id == commentId)
+          console.log(comment)
+        if (post && comment) {
+          comment.LikeCom.push(like)
+          comment.likeStatus = true;
+        } 
+      })
+      .addCase(createLikeComment.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || null;
+      })
+
+      // Удаление лайка
+      .addCase(deleteLikeComment.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deleteLikeComment.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const { commentId, postId, userId } = action.payload; 
+        const post = state.posts.find(post => post.id == postId);
+        const comment = post?.Comments.find(comment => comment.id == commentId)
+
+        if (post && comment) {
+          comment.LikeCom = comment.LikeCom.filter(like => like.userId !== userId);
+          comment.likeStatus = false;
+        }
+      })
+      .addCase(deleteLikeComment.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || null;
       })

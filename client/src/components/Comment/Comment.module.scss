@@ -1,3 +1,5 @@
+@import '../../styles/mixins';
+
 .postContent {
   margin-top: 10px;
 }
@@ -102,4 +104,13 @@ outline: none;
 margin-left: 10px;
 color: rgb(152, 145, 255) !important;
 cursor: pointer;
+}
+.likeButton {
+  margin-right: 10px;
+  max-width: 20px;
+  max-height: 20px;
+  cursor: pointer;
+}
+.likeContainer {
+  @include likeContainer;
 }

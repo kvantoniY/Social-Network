@@ -1,15 +1,20 @@
 .avatar {
-    display: block; /* Убираем отступы по умолчанию */
-    width: 45px; /* Задайте ширину */
-    height: 45px; /* Задайте высоту */
-    border-radius: 50%; /* Сделает контейнер круглым */
-    object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
-    margin-right: 5px;
-  }
-  
+  display: block;
+  /* Убираем отступы по умолчанию */
+  width: 45px;
+  /* Задайте ширину */
+  height: 45px;
+  /* Задайте высоту */
+  border-radius: 50%;
+  /* Сделает контейнер круглым */
+  object-fit: cover;
+  /* Заполняет контейнер, сохраняя пропорции */
+  margin-right: 5px;
+}
+
 .userContainer {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .nav img {
@@ -17,13 +22,57 @@
   max-height: 25px;
   cursor: pointer;
 }
+
 .navMenu {
   display: flex;
   align-items: center;
 }
-.navMenu img{
+
+.navMenu img {
   margin-left: 20px;
 }
+
 .logout {
   margin-left: 10px;
+}
+
+.noticeContainer {
+  position: relative;
+
+  img {
+    cursor: pointer;
+  }
+
+  .badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 7px;
+    font-size: 12px;
+  }
+}
+
+.notifications {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 20px;
+
+  .notification {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }

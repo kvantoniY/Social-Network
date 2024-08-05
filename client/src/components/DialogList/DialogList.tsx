@@ -6,19 +6,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { User } from '../../types/types';
 import styles from './DialogList.module.scss';
-
-interface Dialog {
-  id: number;
-  userId1: number;
-  userId2: number;
-  unreadCount: number;
-  User1: User;
-  User2: User;
-}
+import { Dialog as DialogType } from '../../types/types'
 
 const DialogsList: React.FC = () => {
   const router = useRouter();
-  const [dialogs, setDialogs] = useState<Dialog[]>([]);
+  const [dialogs, setDialogs] = useState<DialogType[]>([]);
   const [socket, setSocket] = useState<any>(null);
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -27,7 +19,7 @@ const DialogsList: React.FC = () => {
       const newSocket = io(':3001');
       setSocket(newSocket);
       newSocket.emit('join', user.id); // Присоединение к комнате пользователя
-      newSocket.on('dialogs update', (updatedDialogs: Dialog[]) => {
+      newSocket.on('dialogs update', (updatedDialogs: DialogType[]) => {
         setDialogs(updatedDialogs);
       });
 
@@ -41,8 +33,8 @@ const DialogsList: React.FC = () => {
     }
   }, [user]);
 
-  const openDialog = (dialogId: number) => {
-    router.push(`/dialogs/${dialogId}`);
+  const openDialog = (dialogUserId: number, dialogId: number) => {
+    router.push(`/dialogs/${dialogUserId}`);
   };
 
   return (
@@ -50,7 +42,7 @@ const DialogsList: React.FC = () => {
       <h2>Ваши диалоги</h2>
       <div>
         {dialogs.map(dialog => (
-          <div key={dialog.id} onClick={() => openDialog(dialog.User1.id)} className={styles.followContainer}>
+          <div key={dialog.id} onClick={() => openDialog(dialog.User1.id, dialog.dialogId)} className={styles.followContainer}>
             <img
               src={`http://localhost:3001/` + (dialog?.User1.image || "default.jpg")}
               alt=""

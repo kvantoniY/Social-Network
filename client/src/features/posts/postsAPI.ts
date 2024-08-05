@@ -54,3 +54,17 @@ export const deleteCommentAPI = async (postId: number, commentId: number) => {
   const response = await axiosInstance.delete(`/comments/${commentId}?postId=${postId}`);
 return response.data;
 };
+
+export const fetchLikesCommentAPI = async (commentId: number) => {
+  const response = await axiosInstance.get(`/comments/likeComment/${commentId}`);
+  return response.data;
+};
+export const createLikeCommentAPI = async (commentId: number) => {
+const response = await axiosInstance.post(`/comments/likeComment/${commentId}`);
+return response.data;
+};
+
+export const deleteLikeCommentAPI = async (commentId: number) => {
+const response = await axiosInstance.delete(`/comments/likeComment/${commentId}`);
+return response.data;
+};
