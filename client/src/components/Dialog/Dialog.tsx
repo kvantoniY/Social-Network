@@ -41,6 +41,8 @@ const Dialog: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [blackListStatus, setBlackListStatus] = useState(false);
+  const [isBlackListStatus, setIsBlackListStatus] = useState(false);
 
   useEffect(() => {
     if (userId && user) {
@@ -49,6 +51,20 @@ const Dialog: React.FC = () => {
       setSocket(newSocket);
       newSocket.emit('join', user?.id); // Присоединение к комнате пользователя
       newSocket.emit('open dialog', Number(user.id), Number(userId)); // Сообщаем серверу об открытии диалога
+      const checkBlackListStatus = async () => {
+        try {
+
+          const response = await axiosInstance.get(`/users/checkBlackList/${userId}`)
+          if (response.data.isBlackList) {
+            setIsBlackListStatus(true)
+          }
+          if (response.data.blUser) {
+            setBlackListStatus(true)
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      }
       const fetchSocketMessages = async () => {
         try {
           newSocket.on('get messages', (msg: Message[]) => {
@@ -72,11 +88,11 @@ const Dialog: React.FC = () => {
           console.log(e);
         }
       };
-
+      checkBlackListStatus();
       fetchSocketMessages();
 
       return () => {
-        
+
         if (newSocket) {
           newSocket.emit('close dialog', Number(user.id), Number(userId)); // Сообщаем серверу о закрытии диалога
           newSocket.off('get messages');
@@ -91,7 +107,7 @@ const Dialog: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [socketMessages]);
-  
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView();
@@ -177,8 +193,8 @@ const Dialog: React.FC = () => {
                 />
               </Link>
               <div className={styles.messageContent}>
-              {message.Sender?.id === user?.id ? <img src={deleteIcon.src} alt="Preview" className={styles.deleteImage} onClick={() => handleDeleteMessage(message.id)}/> : <div></div>}
-              
+                {message.Sender?.id === user?.id ? <img src={deleteIcon.src} alt="Preview" className={styles.deleteImage} onClick={() => handleDeleteMessage(message.id)} /> : <div></div>}
+
                 <div className={styles.userHeader}>
                   <Link href={`/users/${message.Sender?.id}`}>
                     <p className={styles.username}>{message.Sender?.username}</p>
@@ -186,8 +202,8 @@ const Dialog: React.FC = () => {
                   <p className={styles.date}>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
                 <div className={styles.messageContents}>
-                <p className={styles.message}>{message.content}</p>{message.read ? 'true' : "false"}
-                {message.image && <img src={`http://localhost:3001/${message.image}`} alt="message image" className={styles.messageImage} />}
+                  <p className={styles.message}>{message.content}</p>{message.read ? 'true' : "false"}
+                  {message.image && <img src={`http://localhost:3001/${message.image}`} alt="message image" className={styles.messageImage} />}
                 </div>
               </div>
             </div>
@@ -195,36 +211,49 @@ const Dialog: React.FC = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={sendSocketMessage} className='createMessage'>
-        <div
-          contentEditable
-          ref={contentRef}
-          className='inputCreatePost'
-          onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
-          suppressContentEditableWarning={true}
-        />
-        {imagePreview && (
-          <div>
-            <div className={styles.imagePreviewContainer}>
-              <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
-              <img src={deleteIconMini.src} alt="Delete" className={styles.deleteImage} onClick={handleDeleteImage} />
-            </div>
-          </div>
-        )}
-        <hr className={styles.separator} />
-        <div className={styles.actions}>
-          <label htmlFor="fileInput" className={styles.fileLabel}>
-            <input
-              id="fileInput"
-              type="file"
-              onChange={selectFile}
-              style={{ display: 'none' }}
-              className={styles.inputFile}
+      {blackListStatus ? (
+        <>
+          <p>Пользователь добавил вас в чёрный список</p>
+        </>
+      ) : isBlackListStatus ? (
+        <>
+          <p>Вы добавили пользователя в чёрный список</p>
+        </>
+      ) : (
+        <>
+          <form onSubmit={sendSocketMessage} className='createMessage'>
+            <div
+              contentEditable
+              ref={contentRef}
+              className='inputCreatePost'
+              onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
+              suppressContentEditableWarning={true}
             />
-          </label>
-          <button type="submit" className={styles.buttonPost}>Опубликовать</button>
-        </div>
-      </form>
+            {imagePreview && (
+              <div>
+                <div className={styles.imagePreviewContainer}>
+                  <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
+                  <img src={deleteIconMini.src} alt="Delete" className={styles.deleteImage} onClick={handleDeleteImage} />
+                </div>
+              </div>
+            )}
+            <hr className={styles.separator} />
+            <div className={styles.actions}>
+              <label htmlFor="fileInput" className={styles.fileLabel}>
+                <input
+                  id="fileInput"
+                  type="file"
+                  onChange={selectFile}
+                  style={{ display: 'none' }}
+                  className={styles.inputFile}
+                />
+              </label>
+              <button type="submit" className={styles.buttonPost}>Опубликовать</button>
+            </div>
+          </form>
+        </>
+      )}
+
     </div>
   );
 };

@@ -16,6 +16,7 @@ import Link from 'next/link';
 import io from 'socket.io-client';
 import axiosInstance from '@/utils/axiosInstance';
 import { Dialog } from '@/types/types';
+import { AddBlackListAPI, CheckBlackListAPI, DeleteBlackListAPI } from '@/features/users/usersAPI';
 
 const UserPage = () => {
   const router = useRouter();
@@ -33,7 +34,8 @@ const UserPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFollowersOpen, setIsModalFollowersOpen] = useState(false);
   const [socket, setSocket] = useState<any>(null);
-
+  const [blackListStatus, setBlackListStatus] = useState(false);
+  const [isBlackListStatus, setIsBlackListStatus] = useState(false);
   const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImage(e.target.files[0]);
@@ -43,6 +45,21 @@ const UserPage = () => {
   useEffect(() => {
     if (id) {
       const numericId = Number(id);
+      const userId = Number(id)
+      const checkBlackListStatus = async () => {
+        try {
+          
+          const response = await axiosInstance.get(`/users/checkBlackList/${userId}`)
+          if(response.data.isBlackList) {
+            setIsBlackListStatus(true)
+          }
+          if(response.data.blUser) {
+            setBlackListStatus(true)
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      }
       dispatch(fetchUser(Number(id)));
       dispatch(fetchUserPosts(Number(id)));
       dispatch(searchFollowers(Number(id)));
@@ -62,6 +79,7 @@ const UserPage = () => {
         }
         console.log(dialogId)
       }
+      checkBlackListStatus();
       findDialogId();
     }
   }, [dispatch, id]);
@@ -83,6 +101,24 @@ const UserPage = () => {
       };
     }
   }, [authUser]);
+
+  const handleBlackList = async (status: string) => {
+    if (status === "add") {
+      try {
+        const response = await AddBlackListAPI(Number(id))
+        setIsBlackListStatus(true)
+      } catch (e) {
+        console.log(e)
+      }
+    } else {
+      try {
+        const response = await DeleteBlackListAPI(Number(id))
+        setIsBlackListStatus(false)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
 
   const handleFollow = async () => {
     try {
@@ -148,8 +184,6 @@ const UserPage = () => {
               style={{ maxWidth: '360px', maxHeight: '240px' }}
               onClick={() => setIsModalOpen(true)}
             />
-            
-            
             </div>
             <div className={styles.userAboutContainer}>
             <h1 className={styles.username}>{user.username}</h1>
@@ -183,7 +217,13 @@ const UserPage = () => {
               </div>
             ) : (
               <div className={styles.subsContainer}>
-                {followStatus === 0 && <button onClick={handleFollow}>Подписаться</button>}
+                {blackListStatus ? (
+                  <>
+                   
+                  </>
+                ) : (
+                  <>
+                  {followStatus === 0 && <button onClick={handleFollow}>Подписаться</button>}
                 {followStatus === 2 && <button onClick={handleFollow}>Подписаться в ответ</button>}
                 {followStatus === 3 && (
                   <div>
@@ -192,6 +232,11 @@ const UserPage = () => {
                   </div>
                 )}
                 {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
+                  </>
+                )}
+                
+                {isBlackListStatus ? <div onClick={() => handleBlackList("delete")}>Убрать ЧС</div> : <div onClick={() => handleBlackList("add")}>Добавить в ЧС</div>}
+                
               </div>
             )}
             <div className={styles.followContainer}>
@@ -213,13 +258,22 @@ const UserPage = () => {
       </div>
       <div>
         {user && authUser?.id === user.id && <CreatePost />}
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <Post key={post.id} post={post} />
-          ))
+        {blackListStatus ? (
+          <>
+            <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
+          </>
         ) : (
-          <p>No posts available</p>
+          <>
+            {posts.length > 0 ? (
+              posts.map((post) => (
+                <Post key={post.id} post={post} />
+              ))
+            ) : (
+              <p>No posts available</p>
+            )}
+          </>
         )}
+
       </div>
     </div>
   );

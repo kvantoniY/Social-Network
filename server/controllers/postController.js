@@ -23,7 +23,15 @@ exports.createPost = async (req, res) => {
       const user = await User.findByPk(req.userId);
 
       const post = await Post.findByPk(addPost.id, {
-        include: [{ model: Like }, { model: Comment }, {model: User}],
+        include: [{ model: Like }, {
+          model: Comment, include: [
+            { model: User },
+            {
+              model: LikeCom,
+              include: [{ model: User }] // Включаем пользователей для лайков комментариев
+            }
+          ]
+        }, { model: User }],
       });
       res.status(201).json(post);
     } else {
@@ -60,35 +68,54 @@ exports.getPost = async (req, res) => {
 };
 
 exports.getPosts = async (req, res) => {
-    try {
-      const posts = await Post.findAll({
-          order: [['createdAt', 'DESC']], // Сортировка по дате создания в обратном порядке
+  try {
+    const posts = await Post.findAll({
+      order: [['createdAt', 'DESC']], // Сортировка по дате создания в обратном порядке
+      include: [
+        {
+          model: Comment,
           include: [
+            { model: User },
             {
-              model: Comment,
-              include: [{ model: User }, {model: LikeCom}], // Загружаем комментарии к посту и связанных с ними пользователей
-            },
-            {
-              model: Like,
-              include: [{ model: User }], // Загружаем лайки к посту и связанные с ними посты
-            },
-            {
-              model: User,
-            },
-          ],
-        });
-        const postsWithLikeStatus = posts.map(post => {
-          const likeStatus = post.Likes.some(like => like.userId === req.userId);
-          return {
-            ...post.get({ plain: true }),
-            likeStatus,
-          };
-        });
-      res.status(200).json(postsWithLikeStatus);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+              model: LikeCom,
+              include: [{ model: User }] // Включаем пользователей для лайков комментариев
+            }
+          ], // Загружаем комментарии к посту и связанных с ними пользователей и лайки комментариев
+        },
+        {
+          model: Like,
+          include: [{ model: User }] // Загружаем лайки к посту и связанные с ними пользователи
+        },
+        {
+          model: User
+        },
+      ],
+    });
+
+    const postsWithLikeStatus = posts.map(post => {
+      const postLikeStatus = post.Likes.some(like => like.userId === req.userId);
+
+      // Обработка комментариев
+      const commentsWithLikeStatus = post.Comments.map(comment => {
+        const commentLikeStatus = comment.LikeComs.some(likeCom => likeCom.userId === req.userId);
+        return {
+          ...comment.get({ plain: true }),
+          likeStatus: commentLikeStatus,
+        };
+      });
+
+      return {
+        ...post.get({ plain: true }),
+        likeStatus: postLikeStatus,
+        Comments: commentsWithLikeStatus, // Добавляем комментарии с likeStatus
+      };
+    });
+
+    res.status(200).json(postsWithLikeStatus);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.getUserPosts = async (req, res) => {
   try {
@@ -99,8 +126,14 @@ exports.getUserPosts = async (req, res) => {
       order: [['createdAt', 'DESC']], // Сортировка по дате создания в обратном порядке
       include: [
         {
-          model: Comment,
-          include: [{ model: User }, {model: LikeCom}], // Загружаем комментарии к посту и связанных с ними пользователей
+            model: Comment,
+            include: [
+              { model: User },
+              {
+                model: LikeCom,
+                include: [{ model: User }] // Включаем пользователей для лайков комментариев
+              }
+            ], // Загружаем комментарии к посту и связанных с ними пользователей и лайки комментариев
         },
         {
           model: Like,
@@ -112,13 +145,23 @@ exports.getUserPosts = async (req, res) => {
       ],
     });
     const postsWithLikeStatus = posts.map(post => {
-      const likeStatus = post.Likes.some(like => like.userId === req.userId);
+      const postLikeStatus = post.Likes.some(like => like.userId === req.userId);
+      // Обработка комментариев
+      const commentsWithLikeStatus = post.Comments.map(comment => {
+        const commentLikeStatus = comment.LikeComs.some(likeCom => likeCom.userId === req.userId);
+        return {
+          ...comment.get({ plain: true }),
+          likeStatus: commentLikeStatus,
+        };
+      });
+
       return {
         ...post.get({ plain: true }),
-        likeStatus,
+        likeStatus: postLikeStatus,
+        Comments: commentsWithLikeStatus, // Добавляем комментарии с likeStatus
       };
     });
-    console.log(`postsWithLikeStatus: ${JSON.stringify(postsWithLikeStatus,null, 2)}`)
+
     res.status(200).json(postsWithLikeStatus);
   } catch (error) {
     res.status(500).json({ error: error.message });

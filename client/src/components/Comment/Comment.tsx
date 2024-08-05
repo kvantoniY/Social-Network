@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Post, Comment as CommentType, User, Like } from '../../types/types';
 import {deleteIcon, likeIcon, unLikeIcon} from '../../assets/'; // Импортируем иконку
+import Modal from '../ui/MyModal/Modal';
+import ModalLikes from '../Modals/ModalLikes/ModalLikes';
 
 interface CommentProps {
     comment: CommentType;
@@ -23,6 +25,7 @@ interface CommentProps {
 const Comment: React.FC<CommentProps> = ({comment, authUser, post, handleDeleteComment, setIsModalLikesOpen, handleLikeComment}) => {
   const isoDateString = comment.createdAt;
 const dateObject = new Date(isoDateString);
+const [isModalLikesComsOpen, setIsModalLikesComsOpen] = useState(false)
 
 // Получаем день и месяц
 const day = dateObject.getDate();
@@ -57,8 +60,8 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
           ) : (
             <img src={unLikeIcon.src} alt="unlike"  onClick={() => handleLikeComment(comment.id, comment.userId)} className={styles.likeButton}/>
             )}
-          <p onClick={() => setIsModalLikesOpen(true)}>
-            {comment.LikeCom ? comment.LikeCom?.length : 0}
+          <p onClick={() => setIsModalLikesComsOpen(true)}>
+            {comment.LikeComs ? comment.LikeComs?.length : 0}
           </p>
         </div>
           {authUser?.id === comment?.userId || authUser?.id === post.userId ? (
@@ -66,7 +69,12 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
           ) : (
           <></>
           )}
-
+                <Modal
+        isOpen={isModalLikesComsOpen}
+        setIsModalOpen={setIsModalLikesComsOpen}
+      >
+        <ModalLikes likes={comment.LikeComs} setIsModalOpen={setIsModalLikesComsOpen}/>
+      </Modal>
           </div>
   )
 }

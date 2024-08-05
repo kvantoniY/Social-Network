@@ -1,9 +1,28 @@
 // src/features/posts/postsAPI.ts
 import axiosInstance from '../../utils/axiosInstance';
+import { User, UserBlackList, Post } from '@/types/types';
+export const fetchPostsAPI = async (currentUserId: number): Promise<Post[]> => {
+  try {
+    // Получаем посты
+    const response = await axiosInstance.get<Post[]>('/posts');
+    // Получаем черный список
+    const blackListResponse = await axiosInstance.get<UserBlackList[]>('/users/allBlackList');
+    const blackList = blackListResponse.data;
 
-export const fetchPostsAPI = async () => {
-  const response = await axiosInstance.get('/posts');
-  return response.data;
+    // Извлекаем идентификаторы заблокированных пользователей и тех, кто нас заблокировал
+    const blackListedUserIds = blackList
+      .filter(user => user.userId === currentUserId || user.blUserId === currentUserId)
+      .map(user => user.userId === currentUserId ? user.blUserId : user.userId);
+
+    // Фильтруем посты, исключая те, которые принадлежат заблокированным пользователям или тем, кто нас заблокировал
+    const filteredPosts = response.data.filter((post: Post) => !blackListedUserIds.includes(post.userId));
+
+    console.log(blackListResponse);
+    return filteredPosts;
+  } catch (error) {
+    console.error('Error fetching posts or black list:', error);
+    throw error;
+  }
 };
 export const fetchUserPostsAPI = async (userId: number) => {
   const response = await axiosInstance.get(`/posts/getUserPosts/${userId}`);

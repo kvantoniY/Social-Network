@@ -13,11 +13,12 @@ interface PostProps {
   post: Post;
   handleDeletePost: (postId: number) => void;
   handleLike: (postId: number, userId: number) => void;
+  handleLikeComment: (commentId: number, userId: number) => void
   date: string;
   setIsModalLikesOpen: any;
 }
 
-const PostModal: React.FC<PostProps> = ({ post, handleDeletePost, handleLike, date, setIsModalLikesOpen}) => {
+const PostModal: React.FC<PostProps> = ({ post, handleDeletePost, handleLike, date, setIsModalLikesOpen, handleLikeComment}) => {
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const [commentText, setCommentText] = useState('');
@@ -97,6 +98,7 @@ const handleDeleteComment = async (postId: number, commentId: number) => {
             authUser={authUser} 
             post={post} 
             handleDeleteComment={handleDeleteComment}
+            handleLikeComment={handleLikeComment}
             setIsModalLikesOpen={setIsModalLikesOpen}/>
           ))
         ) : (

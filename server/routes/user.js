@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById, getAllUsers, searchUsers, searchUsersByUsername, getUserByUsername, editUser, editUserAvatar, blackListUsers } = require('../controllers/userController');
+const { getUserById, getAllUsers, searchUsers, searchUsersByUsername, getUserByUsername, editUser, editUserAvatar, blackListUsers, addBlackListUser, deleteBlackListUser, allBlackListUsers } = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 
+
 router.get('/search', authMiddleware, searchUsers);
-router.get('/:userId', getUserById);
-router.put('/', authMiddleware, editUser)
-router.put('/editUserAvatar', authMiddleware, editUserAvatar)
+router.get('/checkBlackList/:userId', authMiddleware, blackListUsers);
+router.post('/addBlackList/:userId', authMiddleware, addBlackListUser);
+router.delete('/deleteBlackList/:userId', authMiddleware, deleteBlackListUser);
+router.get('/allBlackList', authMiddleware, allBlackListUsers);
+router.put('/', authMiddleware, editUser);
+router.put('/editUserAvatar', authMiddleware, editUserAvatar);
 router.post('/', getUserByUsername);
-router.post('/checkBlackList', authMiddleware, blackListUsers)
+router.get('/:userId', getUserById);
 router.get('/', getAllUsers);
 
 

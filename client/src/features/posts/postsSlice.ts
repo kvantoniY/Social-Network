@@ -17,8 +17,8 @@ const initialState: PostsState = {
 
 // Posts
 // Поиск всех постов
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
-  return await fetchPostsAPI();
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (currentUserId: number) => {
+  return await fetchPostsAPI(currentUserId);
 });
 // Поиск постов определенного пользователя
 export const fetchUserPosts = createAsyncThunk('posts/fetchUserPosts', async (userId: number) => {
@@ -208,8 +208,10 @@ const postsSlice = createSlice({
           const comment = post?.Comments.find(comment => comment.id == commentId)
           console.log(comment)
         if (post && comment) {
-          comment.LikeCom.push(like)
+          console.log("Before pushing like:", comment.LikeComs, comment.likeStatus);
+          comment.LikeComs.push(like)
           comment.likeStatus = true;
+          console.log("After pushing like:", comment.LikeComs, comment.likeStatus);
         } 
       })
       .addCase(createLikeComment.rejected, (state, action) => {
@@ -228,7 +230,7 @@ const postsSlice = createSlice({
         const comment = post?.Comments.find(comment => comment.id == commentId)
 
         if (post && comment) {
-          comment.LikeCom = comment.LikeCom.filter(like => like.userId !== userId);
+          comment.LikeComs = comment.LikeComs.filter(like => like.userId !== userId);
           comment.likeStatus = false;
         }
       })

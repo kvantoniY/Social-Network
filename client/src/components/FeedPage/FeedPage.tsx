@@ -8,13 +8,17 @@ import CreatePost from '../CreatePost/CreatePost';
 import { fetchUserProfile } from '@/features/auth/authSlice';
 import { useState } from 'react';
 import styles from './FeedPage.module.scss'
+import axiosInstance from '@/utils/axiosInstance';
 const FeedPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, status, error } = useSelector((state: RootState) => state.posts);
+  const { user } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
-
+    if (user) {
+      dispatch(fetchPosts(user.id));
+    }
+  }, [dispatch, user]);
+  
   return (
     <div className={styles.feedPage}>
       <CreatePost />

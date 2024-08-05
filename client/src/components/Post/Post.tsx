@@ -84,22 +84,23 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
     }
   };
   const handleLikeComment = async (commentId: number, userId: number) => {
-    if (post.likeStatus) {
+    const comment = post.Comments.find(comment => comment.id === commentId);
+    if (comment?.likeStatus) {
       dispatch(deleteLikeComment(commentId));
     } else {
       try {
         dispatch(createLikeComment(commentId));
-        // const notificationData = {
-        //   type: 'like',
-        //   userId: Number(userId),
-        //   actorId: authUser?.id,
-        //   postId: postId,
-        // };
-        // socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+        const notificationData = {
+          type: 'likeCom',
+          userId: Number(userId),
+          actorId: authUser?.id,
+          postId: post.id,
+          commentId: commentId,
+        };
+        socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-
     }
   };
 
@@ -216,6 +217,7 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
         date={formattedDate}
         handleDeletePost={handleDeletePost}
         handleLike={handleLike}
+        handleLikeComment={handleLikeComment}
         setIsModalLikesOpen={setIsModalLikesOpen}
         />
       </Modal>

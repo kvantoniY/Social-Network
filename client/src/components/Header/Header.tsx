@@ -52,6 +52,7 @@ const Header: React.FC = () => {
         setNotifications(notifications);
         let unreadNotifications = notifications.filter(notification => notification.isRead === false)
         setNotificationsRead(unreadNotifications.length)
+        console.log(notifications)
       });
 
       newSocket.emit('get_notifications', user.id);
@@ -120,6 +121,11 @@ const Header: React.FC = () => {
                                 Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> написал комментарий под ваш пост 
                                 <div><img src={`http://localhost:3001/` + notification.Post?.image || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}</div>
                               </div>
+                          ) : notification.type === 'likeCom' ? (
+                            <div key={notification.id} className={styles.notification}>
+                               Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> 
+                               лайкнул ваш комментарий {notification.Comment ? getPostContentSnippet(notification.Comment.content) : ''}
+                            </div>
                           ) : (
                                 <div key={notification.id} className={styles.notification}>
                                   Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> подписался на вас

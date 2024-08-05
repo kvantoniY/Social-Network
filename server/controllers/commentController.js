@@ -17,25 +17,46 @@ exports.fetchComments = async (req, res) => {
 };
 
 exports.createComment = async (req, res) => {
-    try {
-        const { commentText } = req.body;
-        const post = await Post.findByPk(req.params.postId);
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-        const addComment = await Comment.create({ content: commentText, postId: req.params.postId, userId: req.userId });
-        const postId = req.params.postId;
-                // Найдите пользователя, чтобы вернуть его вместе с комментарием
-                const user = await User.findByPk(req.userId);
+  try {
+      const { commentText } = req.body;
+      const post = await Post.findByPk(req.params.postId);
+      if (!post) {
+          return res.status(404).json({ message: 'Post not found' });
+      }
 
-                const comment = {
-                    ...addComment.dataValues,
-                    User: user // Добавьте пользователя к комментарию
-                };
-        res.status(201).json({comment, postId});
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+      const addComment = await Comment.create({
+          content: commentText,
+          postId: req.params.postId,
+          userId: req.userId
+      });
+
+      // Найдите пользователя, чтобы вернуть его вместе с комментарием
+      const user = await User.findByPk(req.userId);
+
+      // Проверить наличие лайков от текущего пользователя
+      const likeStatus = await LikeCom.findOne({
+          where: { commentId: addComment.id, userId: req.userId }
+      });
+
+      // Найти все лайки для нового комментария
+      const likeComs = await LikeCom.findAll({
+          where: { commentId: addComment.id },
+          include: [{ model: User }]
+      });
+
+      const comment = {
+          ...addComment.dataValues,
+          User: user, // Добавьте пользователя к комментарию
+          likeStatus: !!likeStatus,
+          LikeComs: likeComs
+      };
+
+      const postId = req.params.postId;
+
+      res.status(201).json({ comment, postId });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
 };
 
 exports.deleteComment = async (req, res) => {
@@ -58,7 +79,7 @@ exports.addLike = async (req, res) => {
       where: { commentId: req.params.commentId, userId: req.userId },
     });
     const findComment = await Comment.findOne({
-        where: { id: req.params.commentId, userId: req.userId },
+        where: { id: req.params.commentId},
       });
 
     const postId = findComment.postId;
@@ -100,7 +121,7 @@ exports.removeLike = async (req, res) => {
       return res.status(404).json({ message: "LikeCom not found" });
     }
     const findComment = await Comment.findOne({
-        where: { id: req.params.commentId, userId: req.userId },
+        where: { id: req.params.commentId },
       });
     
     const postId = findComment.postId;

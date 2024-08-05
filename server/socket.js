@@ -2,11 +2,13 @@ const { Server } = require('socket.io');
 const Message = require('./models/Message');
 const Dialog = require('./models/Dialog');
 const User = require('./models/User');
+const Comment = require('./models/Comment');
 const Notification = require('./models/Notification');
 const Post = require('./models/Post')
 const path = require('path');
 const fs = require('fs');
 const { Op } = require('sequelize');
+const BlackList = require('./models/BlackList');
 const socketHandler = (server) => {
   const io = new Server(server, {
     cors: {
@@ -46,6 +48,16 @@ const socketHandler = (server) => {
         const { content, receiverId, senderId, image } = msg;
         let isRead = true;
         const dialogId = receiverId + senderId;
+        let blUser = await BlackList.findOne({ where: { blUserId: senderId, userId: receiverId } });
+        let isBlackList = await BlackList.findOne({ where: { blUserId: receiverId, userId: senderId } });
+        if (blUser) {
+          io.to(`dialog_${dialogId}`).emit('error', { message: 'You are blocked by the receiver.' });
+          return; // Прекратить выполнение, если пользователь заблокирован
+        }
+        if (isBlackList) {
+          io.to(`dialog_${dialogId}`).emit('error', { message: 'You are blocked the receiver.' });
+          return; // Прекратить выполнение, если пользователь заблокирован
+        }
         let dialog = await Dialog.findOne({
           where: { userId1: senderId, userId2: receiverId }
         });
@@ -105,10 +117,10 @@ const socketHandler = (server) => {
       }
     });
     socket.on('create_notification', async (data) => {
-      const { type, userId, actorId, postId } = data;
+      const { type, userId, actorId, postId, commentId } = data;
 
       // Создание уведомления
-      const notification = await Notification.create({ type, userId, actorId, postId });
+      const notification = await Notification.create({ type, userId, actorId, postId, commentId });
 
       // Получение данных о пользователе и посте с использованием include
       const fullNotification = await Notification.findOne({
@@ -116,7 +128,8 @@ const socketHandler = (server) => {
         include: [
           { model: User, as: 'User' },
           { model: User, as: 'Actor' },
-          { model: Post, as: 'Post' }
+          { model: Post, as: 'Post' },
+          { model: Comment, as: 'Comment' }
         ]
       });
 
@@ -131,6 +144,9 @@ const socketHandler = (server) => {
           break;
         case 'comment':
           message = `Пользователь ${fullNotification.Actor.username} написал комментарий к вашему посту ${fullNotification.Post.id}`;
+          break;
+        case 'likeCom':
+          message = `Пользователь ${fullNotification.Actor.username} поставил лайк вашему комментарию ${fullNotification.Comment.id}`;
           break;
         default:
           return;
@@ -150,7 +166,8 @@ const socketHandler = (server) => {
         include: [
           { model: User, as: 'User' },
           { model: User, as: 'Actor' },
-          { model: Post, as: 'Post' }
+          { model: Post, as: 'Post' },
+          { model: Comment, as: 'Comment' }
         ]
       });
       io.to(userId).emit('notifications', notifications);
@@ -162,7 +179,8 @@ const socketHandler = (server) => {
         include: [
           { model: User, as: 'User' },
           { model: User, as: 'Actor' },
-          { model: Post, as: 'Post' }
+          { model: Post, as: 'Post' },
+          { model: Comment, as: 'Comment' }
         ]
       });
       io.to(userId).emit('notifications', notifications);

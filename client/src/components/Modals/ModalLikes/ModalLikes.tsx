@@ -1,10 +1,10 @@
-import { Like } from '@/types/types';
+import { Like, LikeCom } from '@/types/types';
 import React from 'react'
 import styles from './ModalLikes.module.scss'
 import Link from 'next/link';
 
 interface ModalLikesProps {
-  likes: Like[];
+  likes: Like[] | LikeCom[];
   setIsModalOpen: any;
 }
 
@@ -27,7 +27,7 @@ const ModalLikes: React.FC<ModalLikesProps> = ({ likes, setIsModalOpen }) => {
           ))}
         </>
       ) : (
-        <p>Пока никто не лайкнул пост :(</p>
+        <p>Пока никто не поставил лайк :(</p>
       )}
 
     </div>
