@@ -27,7 +27,8 @@ const BlackList = sequelize.define('BlackList', {
     }
 });
 
-User.belongsToMany(User, { through: BlackList, as: 'blUsers', foreignKey: 'blUserId' });
-User.belongsToMany(User, { through: BlackList, as: 'userId', foreignKey: 'userId' });
+
+BlackList.belongsTo(User, { through: BlackList, as: 'BlockedUsers', foreignKey: 'userId' });
+BlackList.belongsTo(User, { through: BlackList, as: 'BlockingUsers', foreignKey: 'blUserId' });
 
 module.exports = BlackList;

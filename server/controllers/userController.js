@@ -110,8 +110,40 @@ exports.allBlackListUsers = async (req, res) => {
 
     // Объединяем оба списка
     const blackList = [...blockedUsers, ...usersWhoBlockedMe];
-
+    
     res.status(200).json(blackList.length > 0 ? blackList : []);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.myBlackListUsers = async (req, res) => {
+  try {
+    const blockedUsers = await BlackList.findAll({
+      where: { userId: req.userId },
+      include: [
+        {
+          model: User,
+          as: 'BlockingUsers', 
+        },
+      ],
+    });
+
+    const usersWhoBlockedMe = await BlackList.findAll({
+      where: { blUserId: req.userId },
+      include: [
+        {
+          model: User,
+          as: 'BlockedUsers',
+        },
+      ],
+    });
+
+ 
+    // Объединяем оба списка
+    const blackList = {blockedUsers: blockedUsers.length > 0 ? [...blockedUsers] : [], usersWhoBlockedMe: blockedUsers.length > 0 ? [...usersWhoBlockedMe] : []};
+    console.log('Blocked Users:', JSON.stringify(blackList, null, 2));
+    res.status(200).json(blackList);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

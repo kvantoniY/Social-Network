@@ -217,7 +217,7 @@ const UserPage = () => {
               </div>
             ) : (
               <div className={styles.subsContainer}>
-                {blackListStatus ? (
+                {blackListStatus === true || isBlackListStatus === true ? (
                   <>
                    
                   </>
