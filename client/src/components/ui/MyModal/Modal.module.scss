@@ -12,6 +12,7 @@
   }
   
   .modalContent {
+    position: relative;
     background: white;
     padding: 20px;
     border-radius: 8px;
@@ -19,7 +20,6 @@
     max-width: 800px;
     height: 100vh; /* Высота на весь экран */
     overflow-y: auto; /* Вертикальная прокрутка */
-    position: relative;
   }
   
   .closeButton {

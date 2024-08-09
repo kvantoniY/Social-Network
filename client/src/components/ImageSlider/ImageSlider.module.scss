@@ -1,0 +1,47 @@
+.slider {
+    position: relative;
+    max-width: 500px;
+    max-height: 500px;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 0px 0px 10px 10px;
+}
+
+.slider_line {
+    display: flex;
+    transition: transform ease 0.6s; /* Adjusted for smoother transitions */
+}
+
+.img_slider {
+    display: flex;
+    object-fit: cover; /* Ensure images scale nicely */
+}
+.img_modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 750px;
+    max-height: 750px;
+}
+
+.button_next {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    max-width: 50px;
+    max-height: 50px;
+    cursor: pointer;
+}
+
+.button_back {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    max-width: 50px;
+    max-height: 50px;
+    cursor: pointer;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}

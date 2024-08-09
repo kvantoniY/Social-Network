@@ -30,14 +30,14 @@ const socketHandler = (server) => {
     });
   
     socket.on('open dialog', (otherUserId, userId) => {
-      const dialogId = otherUserId + userId;
+      const dialogId = [userId, otherUserId].sort().join('_');
       socket.join(`dialog_${dialogId}`);
       activeDialogs.set(userId, true); // добавляем диалог в активные при открытии
       console.log(`open dialog, status active user: ${activeDialogs.has(dialogId)}`)
     });
 
     socket.on('close dialog', (otherUserId, userId) => {
-      const dialogId = otherUserId + userId;
+      const dialogId = [userId, otherUserId].sort().join('_');
       activeDialogs.delete(dialogId); // удаляем диалог из активных при закрытии'
       activeDialogs.delete(userId); // удаляем диалог из активных при закрытии'
       console.log(`close dialog, status active user: ${activeDialogs.has(dialogId)}`)
@@ -45,9 +45,9 @@ const socketHandler = (server) => {
   
     socket.on('chat message', async (msg) => {
       try {
-        const { content, receiverId, senderId, image } = msg;
+        const { content, receiverId, senderId, images } = msg;
         let isRead = true;
-        const dialogId = receiverId + senderId;
+        const dialogId = [senderId, receiverId].sort().join('_');
         let blUser = await BlackList.findOne({ where: { blUserId: senderId, userId: receiverId } });
         let isBlackList = await BlackList.findOne({ where: { blUserId: receiverId, userId: senderId } });
         if (blUser) {
@@ -66,27 +66,27 @@ const socketHandler = (server) => {
         });
 
         if (!dialog) {
-          dialog = await Dialog.create({ userId1: senderId, userId2: receiverId, dialogId: dialogId });
+          dialog = await Dialog.create({ userId1: senderId, userId2: receiverId });
         }
         if (!secondDialog) {
-          secondDialog = await Dialog.create({ userId1: receiverId, userId2: senderId, dialogId: dialogId });
+          secondDialog = await Dialog.create({ userId1: receiverId, userId2: senderId});
         }
 
-        let imageUrl = null;
-        if (image) {
-          const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-          const buffer = Buffer.from(base64Data, 'base64');
-          const imageName = `${Date.now()}.jpg`;
-          const imagePath = path.join(__dirname, 'static', imageName);
-          fs.writeFileSync(imagePath, buffer);
-          imageUrl = imageName;
+        const imagesArr = [];
+        if (images) {
+          const uploadedImages = Array.isArray(images) ? images : [images];
+          for (const image of uploadedImages) {
+            let fileName = uuid.v4() + ".jpg";
+            await image.mv(path.resolve(__dirname, "..", "static", fileName));
+            imagesArr.push(fileName);
+          }
         }
         if (!activeDialogs.has(senderId)) {
           dialog.unreadCount += 1;
           await dialog.save();
           isRead = false;
         }
-        let message = await Message.create({ content, senderId, receiverId, image: imageUrl, read: isRead });
+        let message = await Message.create({ content, senderId, receiverId, images, read: isRead });
   
         const messageWithUsers = await Message.findOne({
           where: { id: message.id },
@@ -203,7 +203,7 @@ const socketHandler = (server) => {
 
     socket.on('get messages', async (userId, otherUserId) => {
       console.log(userId, otherUserId)
-      const dialogId = otherUserId + userId;
+      const dialogId = [userId, otherUserId].sort().join('_');
       try {
         const messages = await Message.findAll({
           where: {

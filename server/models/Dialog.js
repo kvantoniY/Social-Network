@@ -19,10 +19,6 @@ const Dialog = sequelize.define("Dialog", {
       key: "id",
     },
   },
-  dialogId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   unreadCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0,

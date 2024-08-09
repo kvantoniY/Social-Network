@@ -13,9 +13,11 @@ const Post = sequelize.define("Post", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  image: {
-    type: DataTypes.STRING,
-    },
+  images: {
+    type: Sequelize.JSON, // Используем JSON вместо ARRAY
+    defaultValue: [],
+    allowNull: true
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

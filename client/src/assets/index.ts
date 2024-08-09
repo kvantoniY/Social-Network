@@ -12,6 +12,8 @@ import switchThemeLight from './switchThemeLight.svg'
 import noticeIcon from './notice.svg'
 import subsIcon from './subs.svg'
 import editIcon from './edit.svg'
+import arrowLeftIcon from './arrowLeftIcon.png'
+import arrowRightIcon from './arrowRightIcon.png'
 
 export {
   deleteIcon,
@@ -27,5 +29,7 @@ export {
   homeIcon,
   dialogsIcon,
   noticeIcon,
-  editIcon
+  editIcon,
+  arrowLeftIcon,
+  arrowRightIcon
 };

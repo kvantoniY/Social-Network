@@ -66,7 +66,7 @@ export interface Post {
   likeStatus: boolean;
   createdAt: string;
   updatedAt: string;
-  image: any;
+  images: any;
 }
 export interface Dialog {
   id: number;

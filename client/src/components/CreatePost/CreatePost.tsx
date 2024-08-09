@@ -1,22 +1,24 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPost } from '../../features/posts/postsSlice';
 import { RootState, AppDispatch } from '../../store/store';
 import styles from "./CreatePost.module.scss";
-import {deleteIconMini} from '../../assets/'
+import { deleteIconMini } from '../../assets/'
 
 const CreatePost = () => {
   const [content, setContent] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const { status, error } = useSelector((state: RootState) => state.posts);
-  const [image, setImage] = useState<any>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]); // Храним массив изображений
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Храним превью для отображения
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-      setImagePreview(URL.createObjectURL(e.target.files[0]));
+  const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      setImages((prevImages) => [...prevImages, ...selectedFiles]);
+      const selectedPreviews = selectedFiles.map(file => URL.createObjectURL(file));
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...selectedPreviews]);
     }
   };
 
@@ -25,23 +27,23 @@ const CreatePost = () => {
     if (content.trim()) {
       const formData = new FormData();
       formData.append('content', content);
-      if (image) {
-        formData.append('image', image);
-      }
+      images.forEach(image => {
+        formData.append('images', image); // Добавляем все изображения
+      });
       dispatch(createPost(formData));
       setContent('');
-      setImage(null);
-      setImagePreview(null);
+      setImages([]);
+      setImagePreviews([]);
       if (contentRef.current) {
         contentRef.current.textContent = '';
       }
     }
   };
 
-  const handleDeleteImage = () => {
-    setImage(null);
-    setImagePreview(null);
-  }
+  const handleDeleteImage = (index: number) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
+  };
 
   return (
     <form onSubmit={handleSubmit} className='createPost'>
@@ -52,11 +54,20 @@ const CreatePost = () => {
         onInput={(e) => setContent(e.currentTarget.textContent || '')}
         suppressContentEditableWarning={true}
       />
-      {imagePreview && (
+      {imagePreviews.length > 0 && (
         <div>
           <div className={styles.imagePreviewContainer}>
-            <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
-            <img src={deleteIconMini.src} alt="Preview" className={styles.deleteImage} onClick={handleDeleteImage}/>
+            {imagePreviews.map((preview, index) => (
+              <div key={index} className={styles.imagePreviewWrapper}>
+                <img src={preview} alt="Preview" className={styles.imagePreview} />
+                <img
+                  src={deleteIconMini.src}
+                  alt="Delete"
+                  className={styles.deleteImage}
+                  onClick={() => handleDeleteImage(index)}
+                />
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -66,7 +77,8 @@ const CreatePost = () => {
           <input
             id="fileInput"
             type="file"
-            onChange={selectFile}
+            multiple // Позволяем выбирать несколько файлов
+            onChange={selectFiles}
             style={{ display: 'none' }}
             className={styles.inputFile}
           />

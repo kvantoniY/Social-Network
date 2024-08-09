@@ -14,6 +14,7 @@ import { Post as PostType, Comment as CommentType, Like } from '../../types/type
 import ModalLikes from '../Modals/ModalLikes/ModalLikes';
 import {deleteIcon, likeIcon, unLikeIcon, commentsIcon} from '../../assets/'; // Импортируем иконку
 import io from 'socket.io-client';
+import ImageSlider from '../ImageSlider/ImageSlider';
 
 interface PostProps {
   post: PostType;
@@ -156,11 +157,12 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
       </Link>
  
       <p className={styles.postContent}>{post.content}</p>
-      <img
-        src={`http://localhost:3001/` + post?.image || "default.jpg"}
-        alt=""
-        className={styles.postImage}
-      />
+       {post.images.length > 0 && (
+          <div className={styles.imageSlider}>
+            <ImageSlider images={post.images} />
+          </div>
+      )}
+
       {authUser?.id === post.userId ? (
  <img src={deleteIcon.src} onClick={() => handleDeletePost(post.id)} className={styles.deleteButton} alt="Delete" />
       ) : (

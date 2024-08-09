@@ -7,8 +7,10 @@ const Message = sequelize.define('Message', {
     type: DataTypes.TEXT,
     allowNull: false
   },
-  image: {
-    type: DataTypes.STRING,
+  images: {
+    type: Sequelize.JSON, // Используем JSON вместо ARRAY
+    defaultValue: [],
+    allowNull: true
     },
   senderId: {
     type: DataTypes.INTEGER,

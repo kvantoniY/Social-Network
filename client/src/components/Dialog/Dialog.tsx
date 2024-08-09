@@ -29,15 +29,14 @@ interface Message {
 const Dialog: React.FC = () => {
   const router = useRouter();
   const { userId } = router.query;
-  const searchParams = useSearchParams();
-  const dialogId = searchParams.get('dialog')
+
   const [newMessage, setNewMessage] = useState<string>('');
   const user = useSelector((state: RootState) => state.auth.user);
   const dialogUser = useSelector((state: RootState) => state.users.user);
   const [socket, setSocket] = useState<any>(null);
   const [socketMessages, setSocketMessages] = useState<Message[]>([]);
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]); // Храним массив изображений
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Храним превью для отображения
   const dispatch = useDispatch<AppDispatch>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -83,7 +82,7 @@ const Dialog: React.FC = () => {
               return updatedMessages;
             });
           });
-          newSocket.emit('get messages', Number(user?.id), Number(userId), Number(dialogId));
+          newSocket.emit('get messages', Number(user?.id), Number(userId));
         } catch (e) {
           console.log(e);
         }
@@ -102,7 +101,7 @@ const Dialog: React.FC = () => {
         }
       };
     }
-  }, [dispatch, userId, user, dialogId]);
+  }, [dispatch, userId, user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -115,53 +114,52 @@ const Dialog: React.FC = () => {
 
   const sendSocketMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() && !image) return;
-    console.log(dialogId)
+    if (!newMessage.trim() && !images) return;
     const reader = new FileReader();
     reader.onloadend = () => {
       const messageData = {
         content: newMessage,
         receiverId: Number(userId),
         senderId: user?.id,
-        image: image ? reader.result : null,
-        dialogId: Number(dialogId)
+        image: images ? reader.result : null,
       };
       socket.emit('chat message', messageData);
       setNewMessage('');
-      setImage(null);
-      setImagePreview(null);
+      setImages([]);
+      setImagePreviews([]);
       if (contentRef.current) {
         contentRef.current.textContent = '';
       }
     };
 
-    if (image) {
-      reader.readAsDataURL(image);
-    } else {
-      const messageData = {
-        content: newMessage,
-        receiverId: Number(userId),
-        senderId: user?.id,
-        dialogId: Number(dialogId)
-      };
-      socket.emit('chat message', messageData);
-      setNewMessage('');
-      if (contentRef.current) {
-        contentRef.current.textContent = '';
-      }
+    // if (images) {
+    //   reader.readAsDataURL(images);
+    // } else {
+    //   const messageData = {
+    //     content: newMessage,
+    //     receiverId: Number(userId),
+    //     senderId: user?.id,
+    //   };
+    //   socket.emit('chat message', messageData);
+    //   setNewMessage('');
+    //   if (contentRef.current) {
+    //     contentRef.current.textContent = '';
+    //   }
+    // }
+  };
+
+  const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      setImages((prevImages) => [...prevImages, ...selectedFiles]);
+      const selectedPreviews = selectedFiles.map(file => URL.createObjectURL(file));
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...selectedPreviews]);
     }
   };
 
-  const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-      setImagePreview(URL.createObjectURL(e.target.files[0]));
-    }
-  };
-
-  const handleDeleteImage = () => {
-    setImage(null);
-    setImagePreview(null);
+  const handleDeleteImage = (index: number) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
   };
 
   const handleDeleteMessage = (messageId: number) => {
@@ -229,21 +227,31 @@ const Dialog: React.FC = () => {
               onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
               suppressContentEditableWarning={true}
             />
-            {imagePreview && (
-              <div>
-                <div className={styles.imagePreviewContainer}>
-                  <img src={imagePreview} alt="Preview" className={styles.imagePreview} />
-                  <img src={deleteIconMini.src} alt="Delete" className={styles.deleteImage} onClick={handleDeleteImage} />
-                </div>
+                      {imagePreviews.length > 0 && (
+        <div>
+          <div className={styles.imagePreviewContainer}>
+            {imagePreviews.map((preview: any, index: any) => (
+              <div key={index} className={styles.imagePreviewWrapper}>
+                <img src={preview} alt="Preview" className={styles.imagePreview} />
+                <img
+                  src={deleteIconMini.src}
+                  alt="Delete"
+                  className={styles.deleteImage}
+                  onClick={() => handleDeleteImage(index)}
+                />
               </div>
-            )}
+            ))}
+          </div>
+        </div>
+      )}
             <hr className={styles.separator} />
             <div className={styles.actions}>
               <label htmlFor="fileInput" className={styles.fileLabel}>
                 <input
                   id="fileInput"
                   type="file"
-                  onChange={selectFile}
+                  onChange={selectFiles}
+                  multiple // Разрешает выбор нескольких файлов
                   style={{ display: 'none' }}
                   className={styles.inputFile}
                 />

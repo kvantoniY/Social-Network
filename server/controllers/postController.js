@@ -9,45 +9,28 @@ const LikeCom = require("../models/LikeCom");
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
-    console.log(req.files);
-    if (req.files && req.files.image) {
-      const image = req.files.image;
-      let fileName = uuid.v4() + ".jpg";
-      await image.mv(path.resolve(__dirname, "..", "static", fileName));
-      const addPost = await Post.create({
-        content,
-        userId: req.userId,
-        image: fileName,
-      });
-      // Найдите пользователя, чтобы вернуть его вместе с комментарием
-      const user = await User.findByPk(req.userId);
+    const images = [];
 
-      const post = await Post.findByPk(addPost.id, {
-        include: [{ model: Like }, {
-          model: Comment, include: [
-            { model: User },
-            {
-              model: LikeCom,
-              include: [{ model: User }] // Включаем пользователей для лайков комментариев
-            }
-          ]
-        }, { model: User }],
-      });
-      res.status(201).json(post);
-    } else {
-      const addPost = await Post.create({
-        content,
-        userId: req.userId,
-        image: "",
-      });
-      // Найдите пользователя, чтобы вернуть его вместе с комментарием
-
-      const post = await Post.findByPk(addPost.id, {
-        include: [{ model: Like }, { model: Comment }, {model: User}],
-      });
-      console.log(post)
-      res.status(201).json(post);
+    if (req.files && req.files.images) {
+      const uploadedImages = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      for (const image of uploadedImages) {
+        let fileName = uuid.v4() + ".jpg";
+        await image.mv(path.resolve(__dirname, "..", "static", fileName));
+        images.push(fileName);
+      }
     }
+
+    const addPost = await Post.create({
+      content,
+      userId: req.userId,
+      images, // Сохраняем массив изображений
+    });
+
+    const post = await Post.findByPk(addPost.id, {
+      include: [{ model: Like }, { model: Comment }, { model: User }],
+    });
+
+    res.status(201).json(post);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
