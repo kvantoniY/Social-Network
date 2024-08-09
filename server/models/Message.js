@@ -8,7 +8,7 @@ const Message = sequelize.define('Message', {
     allowNull: false
   },
   images: {
-    type: Sequelize.JSON, // Используем JSON вместо ARRAY
+    type: DataTypes.JSON,  // Используем JSON для хранения массива изображений
     defaultValue: [],
     allowNull: true
     },

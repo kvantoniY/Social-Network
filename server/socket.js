@@ -16,7 +16,8 @@ const socketHandler = (server) => {
       methods: ["GET", "POST"],
       allowedHeaders: ["my-custom-header"],
       credentials: true
-    }
+    },
+    maxHttpBufferSize: 1e7 // Увеличиваем размер буфера до 10MB
   });
 
   const activeDialogs = new Map(); // добавьте это в начало файла для хранения активных диалогов пользователей
@@ -46,6 +47,7 @@ const socketHandler = (server) => {
     socket.on('chat message', async (msg) => {
       try {
         const { content, receiverId, senderId, images } = msg;
+
         let isRead = true;
         const dialogId = [senderId, receiverId].sort().join('_');
         let blUser = await BlackList.findOne({ where: { blUserId: senderId, userId: receiverId } });
@@ -72,21 +74,23 @@ const socketHandler = (server) => {
           secondDialog = await Dialog.create({ userId1: receiverId, userId2: senderId});
         }
 
-        const imagesArr = [];
-        if (images) {
-          const uploadedImages = Array.isArray(images) ? images : [images];
-          for (const image of uploadedImages) {
-            let fileName = uuid.v4() + ".jpg";
-            await image.mv(path.resolve(__dirname, "..", "static", fileName));
-            imagesArr.push(fileName);
-          }
+        const imagePaths = [];
+        if (images && images.length > 0) {
+          images.forEach((imageData, index) => {
+            const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+            const fileName = `message_${Date.now()}_${index}.png`;
+            const filePath = path.join(__dirname, 'static', fileName);
+            fs.writeFileSync(filePath, base64Data, 'base64');
+            imagePaths.push(fileName);
+          });
         }
+
         if (!activeDialogs.has(senderId)) {
           dialog.unreadCount += 1;
           await dialog.save();
           isRead = false;
         }
-        let message = await Message.create({ content, senderId, receiverId, images, read: isRead });
+        let message = await Message.create({ content, senderId, receiverId, images: imagePaths, read: isRead });
   
         const messageWithUsers = await Message.findOne({
           where: { id: message.id },

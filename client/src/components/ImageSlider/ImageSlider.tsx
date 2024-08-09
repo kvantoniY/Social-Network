@@ -2,17 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './ImageSlider.module.scss'
 import Modal from '../ui/MyModal/Modal';
 import ImageModal from '../ui/ImageModal/ImageModal';
+import { useRouter } from 'next/router';
 
 interface ImageSliderProps {
   images: string[];
 }
 
 const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
-
+  const router = useRouter()
+  const { userId } = router.query;
   const [count, setCount] = useState<number>(0);
   const sliderRef = useRef<HTMLDivElement>(null);
     const [isOpen, setIsModalOpen] = useState(false)      
     const [modalImage, setModalImage] = useState('');
+
   useEffect(() => {
     const updateSliderWidth = () => {
       if (!sliderRef.current) return;
@@ -25,8 +28,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
       });
     };
 
-    window.addEventListener('resize', updateSliderWidth);
     updateSliderWidth(); // Инициализация ширины слайдера при монтировании
+
+    window.addEventListener('resize', updateSliderWidth);
 
     return () => {
       window.removeEventListener('resize', updateSliderWidth);
