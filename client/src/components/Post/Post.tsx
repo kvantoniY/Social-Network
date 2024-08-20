@@ -55,21 +55,30 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
     const baseURL = "http://localhost:3001/";
 
     post.sourceImages.forEach((imageSrc) => {
-        const link = document.createElement('a');
-        link.href = baseURL + imageSrc;
+      fetch(baseURL + imageSrc)
+        .then(response => response.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
 
-        // Генерация имени файла для скачивания
-        const fileName = imageSrc.split('/').pop() || 'source-image.jpg';
-        link.download = fileName;
+          // Генерация имени файла для скачивания
+          const fileName = imageSrc.split('/').pop() || 'source-image.jpg';
+          link.download = fileName;
 
-        // Обработка клика по ссылке для скачивания файла
-        document.body.appendChild(link);
-        link.click();
+          // Обработка клика по ссылке для скачивания файла
+          document.body.appendChild(link);
+          link.click();
 
-        // Удаление ссылки из DOM после скачивания
-        document.body.removeChild(link);
+          // Удаление ссылки из DOM после скачивания
+          document.body.removeChild(link);
+
+          // Очистка URL-объекта
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Ошибка при скачивании изображения:', error));
     });
-};
+  };
 
   const handleLike = async (postId: number, userId: number) => {
     if (post.likeStatus) {

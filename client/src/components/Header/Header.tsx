@@ -114,12 +114,12 @@ const Header: React.FC = () => {
                           {notification.type === 'like' ? (
                             <div key={notification.id} className={styles.notification}>
                               Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> 
-                              поставил лайк на ваш пост <img src={`http://localhost:3001/` + notification.Post?.image || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}
+                              поставил лайк на ваш пост <img src={`http://localhost:3001/` + notification.Post?.images[0] || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}
                             </div>
                           ) : notification.type === 'comment' ? (
                               <div key={notification.id} className={styles.notification}>
                                 Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> написал комментарий под ваш пост 
-                                <div><img src={`http://localhost:3001/` + notification.Post?.image || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}</div>
+                                <div><img src={`http://localhost:3001/` + notification.Post?.images[0] || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}</div>
                               </div>
                           ) : notification.type === 'likeCom' ? (
                             <div key={notification.id} className={styles.notification}>
@@ -152,6 +152,10 @@ const Header: React.FC = () => {
                 />
                 <p>{user.username}</p>
                 <img src={logoutIcon.src} alt="logout" onClick={handleLogout} className={styles.logout} />
+                <Link href={`/settings`} className={styles.userContainer}>
+                1
+                  <img src={logoutIcon.src} alt="logout" className={styles.logout} />
+                </Link>
               </Link>
             </div>
           </>

@@ -107,6 +107,34 @@ const handleDeleteComment = async (postId: number, commentId: number) => {
       socket.emit('chat message', messageData);
     }
   }
+  const handleDownloadSources = () => {
+    const baseURL = "http://localhost:3001/";
+
+    post.sourceImages.forEach((imageSrc) => {
+      fetch(baseURL + imageSrc)
+        .then(response => response.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+
+          // Генерация имени файла для скачивания
+          const fileName = imageSrc.split('/').pop() || 'source-image.jpg';
+          link.download = fileName;
+
+          // Обработка клика по ссылке для скачивания файла
+          document.body.appendChild(link);
+          link.click();
+
+          // Удаление ссылки из DOM после скачивания
+          document.body.removeChild(link);
+
+          // Очистка URL-объекта
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Ошибка при скачивании изображения:', error));
+    });
+  };
   
   return (
     <div className='post'>
@@ -156,6 +184,11 @@ const handleDeleteComment = async (postId: number, commentId: number) => {
         <div className={styles.shareContainer}>
           <img src={commentsIcon.src} alt="comments" className={styles.commentsButton} onClick={() => setIsModalShareOpen(true)}/>
         </div>
+        {post.sourceImages.length > 0 && (
+                    <button onClick={handleDownloadSources}>
+                        Download Source Images
+                    </button>
+                )}
       </div>
       <div className={styles.sendCommentContainer}>
         <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
