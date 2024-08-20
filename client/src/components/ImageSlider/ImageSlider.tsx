@@ -1,80 +1,56 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './ImageSlider.module.scss'
-import Modal from '../ui/MyModal/Modal';
+import React, { useState } from 'react';
+import styles from './ImageSlider.module.scss';
 import ImageModal from '../ui/ImageModal/ImageModal';
-import { useRouter } from 'next/router';
 
-interface ImageSliderProps {
+interface SliderProps {
   images: string[];
 }
 
-const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
-  const router = useRouter()
-  const { userId } = router.query;
-  const [count, setCount] = useState<number>(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
-    const [isOpen, setIsModalOpen] = useState(false)      
-    const [modalImage, setModalImage] = useState('');
+const ImageSlider: React.FC<SliderProps> = ({ images }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState('');
 
-  useEffect(() => {
-    const updateSliderWidth = () => {
-      if (!sliderRef.current) return;
-      const width = sliderRef.current.offsetWidth;
-      sliderRef.current.style.width = `${width * images.length}px`;
-      Array.from(sliderRef.current.children).forEach((child, index) => {
-        const imgElement = child as HTMLImageElement;
-        imgElement.style.width = `${width}px`;
-        imgElement.style.height = 'auto';
-      });
-    };
-
-    updateSliderWidth(); // Инициализация ширины слайдера при монтировании
-
-    window.addEventListener('resize', updateSliderWidth);
-
-    return () => {
-      window.removeEventListener('resize', updateSliderWidth);
-    };
-  }, [images]);
-
-  const rollSlider = () => {
-    if (!sliderRef.current) return;
-    const width = sliderRef.current.offsetWidth / images.length;
-    sliderRef.current.style.transform = `translateX(-${count * width}px)`;
+  const prevSlide = () => {
+    const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
   };
 
-  useEffect(() => {
-    rollSlider();
-  }, [count, images]);
-
-  const handleNextClick = () => {
-    setCount(prevCount => (prevCount + 1) % images.length);
+  const nextSlide = () => {
+    const newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
   };
 
-  const handleBackClick = () => {
-    setCount(prevCount => (prevCount - 1 + images.length) % images.length);
-  };
   const handleOpenModal = (image: string) => {
-    setModalImage(image)
-    setIsModalOpen(true)
-  }
+    setModalImage(image);
+    setIsModalOpen(true);
+  };
 
   return (
-    <div className={styles.slider}>
-    <div ref={sliderRef} className={styles.slider_line}>
-        {images.map((src, index) => (
-        <>
-          <img key={index} src={`http://localhost:3001/` + src} alt="" className={styles.img_slider} onClick={() => handleOpenModal(src)}/>
-        </>
+    <div className={styles.sliderContainer}>
+      <button className={styles.prevButton} onClick={prevSlide}>
+        &#10094;
+      </button>
+      <div className={styles.imageContainer}>
+        {images.map((image, index) => (
+          <img
+            key={index}
+            src={`http://localhost:3001/` + image}
+            alt={`Slide ${index}`}
+            className={`${styles.image} ${index === currentIndex ? styles.active : ''}`}
+            style={{ transform: `translateX(${(index - currentIndex) * 100}%)` }}
+            onClick={() => handleOpenModal(image)}
+          />
         ))}
       </div>
+      <button className={styles.nextButton} onClick={nextSlide}>
+        &#10095;
+      </button>
       <ImageModal isOpen={isOpen} setIsModalOpen={setIsModalOpen}>
-            <div>
-                <img src={`http://localhost:3001/` + modalImage} alt="" className={styles.img_modal} />
-            </div>
-       </ImageModal>
-    <button className={styles.button_next} onClick={handleNextClick}>Next</button>
-      <button className={styles.button_back} onClick={handleBackClick}>Back</button>
+        <div>
+          <img src={`http://localhost:3001/` + modalImage} alt="" className={styles.img_modal} />
+        </div>
+      </ImageModal>
     </div>
   );
 };

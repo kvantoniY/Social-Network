@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI, createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI, fetchCommentsAPI, fetchLastCommentAPI, createLikeCommentAPI, deleteLikeCommentAPI } from './postsAPI';
+import { fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI, createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI, fetchCommentsAPI, fetchLastCommentAPI, createLikeCommentAPI, deleteLikeCommentAPI, fetchPostAPI } from './postsAPI';
 
 import { Post, User, Comment, Like } from '../../types/types';
 
@@ -19,6 +19,9 @@ const initialState: PostsState = {
 // Поиск всех постов
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (currentUserId: number) => {
   return await fetchPostsAPI(currentUserId);
+});
+export const fetchPost = createAsyncThunk('posts/fetchPost', async (postId: number) => {
+  return await fetchPostAPI(postId);
 });
 // Поиск постов определенного пользователя
 export const fetchUserPosts = createAsyncThunk('posts/fetchUserPosts', async (userId: number) => {
@@ -86,7 +89,17 @@ const postsSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || null;
       })
-
+      .addCase(fetchPost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchPost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.posts = action.payload;
+      })
+      .addCase(fetchPost.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || null;
+      })
      // Поиск постов пользователя
       .addCase(fetchUserPosts.pending, (state) => {
         state.status = 'loading';

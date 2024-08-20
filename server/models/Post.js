@@ -14,7 +14,12 @@ const Post = sequelize.define("Post", {
     allowNull: false,
   },
   images: {
-    type: DataTypes.JSON,  // Используем JSON для хранения массива изображений
+    type: DataTypes.JSON,  // Используем JSON для хранения массива мемов
+    defaultValue: [],
+    allowNull: true
+  },
+  sourceImages: {
+    type: DataTypes.JSON,  // Используем JSON для хранения массива исходных изображений
     defaultValue: [],
     allowNull: true
   },

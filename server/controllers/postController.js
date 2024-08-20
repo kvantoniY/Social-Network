@@ -10,20 +10,33 @@ exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
     const images = [];
+    const sourceImages = [];
 
-    if (req.files && req.files.images) {
-      const uploadedImages = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
-      for (const image of uploadedImages) {
-        let fileName = uuid.v4() + ".jpg";
-        await image.mv(path.resolve(__dirname, "..", "static", fileName));
-        images.push(fileName);
+    if (req.files) {
+      if (req.files.images) {
+        const uploadedImages = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+        for (const image of uploadedImages) {
+          let fileName = uuid.v4() + ".jpg";
+          await image.mv(path.resolve(__dirname, "..", "static", fileName));
+          images.push(fileName);
+        }
+      }
+
+      if (req.files.sourceImages) {
+        const uploadedSourceImages = Array.isArray(req.files.sourceImages) ? req.files.sourceImages : [req.files.sourceImages];
+        for (const sourceImage of uploadedSourceImages) {
+          let fileName = uuid.v4() + ".jpg";
+          await sourceImage.mv(path.resolve(__dirname, "..", "static", fileName));
+          sourceImages.push(fileName);
+        }
       }
     }
 
     const addPost = await Post.create({
       content,
       userId: req.userId,
-      images, // Сохраняем массив изображений
+      images,       // Сохраняем массив мемов
+      sourceImages, // Сохраняем массив исходных изображений
     });
 
     const post = await Post.findByPk(addPost.id, {
@@ -39,12 +52,51 @@ exports.createPost = async (req, res) => {
 exports.getPost = async (req, res) => {
   try {
     const post = await Post.findByPk(req.params.postId, {
-      include: [{ model: Like }, { model: Comment }],
+      include: [
+        {
+          model: Comment,
+          include: [
+            { model: User },
+            {
+              model: LikeCom,
+              include: [{ model: User }] // Включаем пользователей для лайков комментариев
+            }
+          ], // Загружаем комментарии к посту и связанных с ними пользователей и лайки комментариев
+        },
+        {
+          model: Like,
+          include: [{ model: User }] // Загружаем лайки к посту и связанные с ними пользователи
+        },
+        {
+          model: User
+        },
+      ],
     });
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-    res.status(200).json(post);
+    
+    const resultPosts = []
+    resultPosts.push(post)
+    const postsWithLikeStatus = resultPosts.map(post => {
+      const postLikeStatus = post.Likes.some(like => like.userId === req.userId);
+
+      // Обработка комментариев
+      const commentsWithLikeStatus = post.Comments.map(comment => {
+        const commentLikeStatus = comment.LikeComs.some(likeCom => likeCom.userId === req.userId);
+        return {
+          ...comment.get({ plain: true }),
+          likeStatus: commentLikeStatus,
+        };
+      });
+
+      return {
+        ...post.get({ plain: true }),
+        likeStatus: postLikeStatus,
+        Comments: commentsWithLikeStatus, // Добавляем комментарии с likeStatus
+      };
+    });
+    res.status(200).json(postsWithLikeStatus);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

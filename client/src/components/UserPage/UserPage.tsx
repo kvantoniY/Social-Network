@@ -102,6 +102,21 @@ const UserPage = () => {
     }
   }, [authUser]);
 
+  const sendMessage = (userId: number, postId: number, newMessage: string, e: React.FormEvent) => {
+    e.preventDefault();
+    if (user) {
+      const messageData = {
+        content: newMessage,
+        receiverId: Number(userId),
+        senderId: user?.id,
+        type: "share",
+        postId: postId
+      };
+      console.log(messageData)
+      socket.emit('chat message', messageData);
+    }
+  }
+
   const handleBlackList = async (status: string) => {
     if (status === "add") {
       try {
@@ -204,16 +219,18 @@ const UserPage = () => {
                   </div>
                 ) : (
                   <div className={styles.editAboutContainer}>
-                    <div className={styles.about}>{user.about}</div>
+                    
                     {authUser?.id === user.id && (
                     <>
                         <div>{user.about?.length < 1 || user.about === null ? <div>Добавить описание</div> : <></>}</div>
                         <img src={editIcon.src} onClick={() => setIsEdit(true)}/>
                     </>
                     )}
+                    
 
                   </div>
                 )}
+                
               </div>
             ) : (
               <div className={styles.subsContainer}>
@@ -249,6 +266,7 @@ const UserPage = () => {
             >
               <ModalFollowers followers={followers} following={following} setIsModalOpen={setIsModalFollowersOpen} openFollowers={openFollowers} setOpenFollowers={setOpenFollowers}/>
             </Modal>
+            <div className={styles.about}>{user.about}</div>
             </div>
            
           </>
@@ -266,7 +284,7 @@ const UserPage = () => {
           <>
             {posts.length > 0 ? (
               posts.map((post) => (
-                <Post key={post.id} post={post} />
+                <Post key={post.id} post={post} socket={socket} sendMessage={sendMessage}/>
               ))
             ) : (
               <p>No posts available</p>

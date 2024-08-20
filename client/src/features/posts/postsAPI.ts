@@ -28,6 +28,10 @@ export const fetchUserPostsAPI = async (userId: number) => {
   const response = await axiosInstance.get(`/posts/getUserPosts/${userId}`);
   return response.data;
 };
+export const fetchPostAPI = async (postId: number) => {
+  const response = await axiosInstance.get(`/posts/${postId}`);
+  return response.data;
+};
 
 export const createPostAPI = async (formData: FormData) => {
   const response = await axiosInstance.post('/posts/', formData, {

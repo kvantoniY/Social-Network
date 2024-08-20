@@ -3,12 +3,14 @@ const Message = require('./models/Message');
 const Dialog = require('./models/Dialog');
 const User = require('./models/User');
 const Comment = require('./models/Comment');
+const Like = require("./models/Like");
 const Notification = require('./models/Notification');
 const Post = require('./models/Post')
 const path = require('path');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const BlackList = require('./models/BlackList');
+const LikeCom = require('./models/LikeCom');
 const socketHandler = (server) => {
   const io = new Server(server, {
     cors: {
@@ -46,12 +48,15 @@ const socketHandler = (server) => {
   
     socket.on('chat message', async (msg) => {
       try {
-        const { content, receiverId, senderId, images } = msg;
+        const { content, receiverId, senderId, images, type, postId } = msg;
 
         let isRead = true;
+
         const dialogId = [senderId, receiverId].sort().join('_');
+
         let blUser = await BlackList.findOne({ where: { blUserId: senderId, userId: receiverId } });
         let isBlackList = await BlackList.findOne({ where: { blUserId: receiverId, userId: senderId } });
+
         if (blUser) {
           io.to(`dialog_${dialogId}`).emit('error', { message: 'You are blocked by the receiver.' });
           return; // Прекратить выполнение, если пользователь заблокирован
@@ -60,13 +65,13 @@ const socketHandler = (server) => {
           io.to(`dialog_${dialogId}`).emit('error', { message: 'You are blocked the receiver.' });
           return; // Прекратить выполнение, если пользователь заблокирован
         }
+
         let dialog = await Dialog.findOne({
           where: { userId1: senderId, userId2: receiverId }
         });
         let secondDialog = await Dialog.findOne({
           where: { userId1: receiverId, userId2: senderId }
         });
-
         if (!dialog) {
           dialog = await Dialog.create({ userId1: senderId, userId2: receiverId });
         }
@@ -75,6 +80,7 @@ const socketHandler = (server) => {
         }
 
         const imagePaths = [];
+
         if (images && images.length > 0) {
           images.forEach((imageData, index) => {
             const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
@@ -90,13 +96,22 @@ const socketHandler = (server) => {
           await dialog.save();
           isRead = false;
         }
-        let message = await Message.create({ content, senderId, receiverId, images: imagePaths, read: isRead });
+        let typeMessage = 'message';
+        let postIdMessage = null;
+        
+        if (type === 'share') {
+          typeMessage = 'share';
+          postIdMessage = postId;
+        }
+
+        let message = await Message.create({ content, senderId, receiverId, images: imagePaths, read: isRead, type: typeMessage, postId: postIdMessage });
   
         const messageWithUsers = await Message.findOne({
           where: { id: message.id },
           include: [
             { model: User, as: 'Sender' },
-            { model: User, as: 'Receiver' }
+            { model: User, as: 'Receiver' },
+            { model: Post, as: 'Post'}
           ]
         });
   
@@ -218,7 +233,8 @@ const socketHandler = (server) => {
           },
           include: [
             { model: User, as: 'Sender' },
-            { model: User, as: 'Receiver' }
+            { model: User, as: 'Receiver' },
+            { model: Post, as: "Post", include: [{ model: User }] },
           ],
           order: [['createdAt', 'ASC']]
         });
@@ -255,14 +271,33 @@ const socketHandler = (server) => {
           where: {
             [Op.or]: [
               { senderId: userId, receiverId: otherUserId },
-              { senderId: otherUserId, receiverId: userId }
-            ]
+              { senderId: otherUserId, receiverId: userId },
+            ],
           },
           include: [
-            { model: User, as: 'Sender' },
-            { model: User, as: 'Receiver' }
+            { model: User, as: "Sender" },
+            { model: User, as: "Receiver" },
+            { model: Post, as: "Post", include: [
+              {
+                model: Comment,
+                include: [
+                  { model: User },
+                  {
+                    model: LikeCom,
+                    include: [{ model: User }] // Включаем пользователей для лайков комментариев
+                  }
+                ], // Загружаем комментарии к посту и связанных с ними пользователей и лайки комментариев
+              },
+              {
+                model: Like,
+                include: [{ model: User }] // Загружаем лайки к посту и связанные с ними пользователи
+              },
+              {
+                model: User
+              },
+            ], },
           ],
-          order: [['createdAt', 'ASC']]
+          order: [["createdAt", "ASC"]],
         });
 
         io.to(userId).emit('dialogs update', dialogs);

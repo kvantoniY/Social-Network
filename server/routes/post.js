@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 
 router.get('/getUserPosts/:userId', authMiddleware, getUserPosts);
-router.get('/:postId', authMiddleware,getPost);
+router.get('/:postId', authMiddleware, getPost);
 router.delete('/:postId', authMiddleware, deletePost);
 router.get('/',authMiddleware, getPosts);
 router.post('/', authMiddleware, createPost);

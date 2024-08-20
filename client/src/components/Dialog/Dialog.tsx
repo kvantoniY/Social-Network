@@ -10,43 +10,39 @@ import { deleteIconMini, deleteIcon } from '../../assets/';
 import { User } from '@/types/types';
 import axiosInstance from '@/utils/axiosInstance';
 import ImageSlider from '../ImageSlider/ImageSlider';
-
-interface Message {
-  id: number;
-  senderId: number;
-  receiverId: number;
-  content: string;
-  images?: string[];
-  createdAt: string;
-  read: boolean;
-  Sender: User;
-  Receiver: User;
-}
+import { Message as MessageType } from '../../types/types'
+import Modal from '../ui/MyModal/Modal';
+import PostModal from '../Modals/ModalPost/ModalPost';
+import { formatDate } from '@/utils/dataUtils';
+import Message from '../Message/Message';
 
 const Dialog: React.FC = () => {
   const router = useRouter();
   const { userId } = router.query;
-
   const [newMessage, setNewMessage] = useState<string>('');
-  const user = useSelector((state: RootState) => state.auth.user);
+  const authUser = useSelector((state: RootState) => state.auth.user);
   const dialogUser = useSelector((state: RootState) => state.users.user);
   const [socket, setSocket] = useState<any>(null);
-  const [socketMessages, setSocketMessages] = useState<Message[]>([]);
+  const [socketMessages, setSocketMessages] = useState<MessageType[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [blackListStatus, setBlackListStatus] = useState(false);
   const [isBlackListStatus, setIsBlackListStatus] = useState(false);
+  
+  const post = useSelector((state: RootState) => state.posts.posts[0]);
 
   useEffect(() => {
-    if (userId && user) {
+    if (userId && authUser) {
       dispatch(fetchUser(Number(userId)));
+
       const newSocket = io(':3001');
       setSocket(newSocket);
-      newSocket.emit('join', user?.id);
-      newSocket.emit('open dialog', Number(user.id), Number(userId));
+      newSocket.emit('join', authUser?.id);
+      newSocket.emit('open dialog', Number(authUser.id), Number(userId));
 
       const checkBlackListStatus = async () => {
         try {
@@ -64,21 +60,21 @@ const Dialog: React.FC = () => {
 
       const fetchSocketMessages = async () => {
         try {
-          newSocket.on('get messages', (msg: Message[]) => {
+          newSocket.on('get messages', (msg: MessageType[]) => {
             setSocketMessages(msg);
             scrollToBottom();
           });
-          newSocket.on('chat message', (msg: Message) => {
+          newSocket.on('chat message', (msg: MessageType) => {
             setSocketMessages((msgs: any) => [...msgs, msg]);
             scrollToBottom();
           });
-          newSocket.on('delete message', (msg: Message) => {
-            setSocketMessages((msgs: Message[]) => {
+          newSocket.on('delete message', (msg: MessageType) => {
+            setSocketMessages((msgs: MessageType[]) => {
               const updatedMessages = msgs.filter(message => message.id !== msg.id);
               return updatedMessages;
             });
           });
-          newSocket.emit('get messages', Number(user?.id), Number(userId));
+          newSocket.emit('get messages', Number(authUser?.id), Number(userId));
         } catch (e) {
           console.log(e);
         }
@@ -88,7 +84,7 @@ const Dialog: React.FC = () => {
 
       return () => {
         if (newSocket) {
-          newSocket.emit('close dialog', Number(user.id), Number(userId));
+          newSocket.emit('close dialog', Number(authUser.id), Number(userId));
           newSocket.off('get messages');
           newSocket.off('chat message');
           newSocket.off('delete message');
@@ -96,7 +92,7 @@ const Dialog: React.FC = () => {
         }
       };
     }
-  }, [dispatch, userId, user]);
+  }, [dispatch, userId, authUser]);
 
   useEffect(() => {
     scrollToBottom();
@@ -124,7 +120,7 @@ const Dialog: React.FC = () => {
       const messageData = {
         content: newMessage,
         receiverId: Number(userId),
-        senderId: user?.id,
+        senderId: authUser?.id,
         images: encodedImages,
       };
       console.log(messageData)
@@ -150,7 +146,7 @@ const Dialog: React.FC = () => {
         alert('Вы не можете добавить больше 5 изображений.');
         return;
       }
-      
+
       setImages((prevImages) => [...prevImages, ...selectedFiles]);
       const selectedPreviews = selectedFiles.map(file => URL.createObjectURL(file));
       setImagePreviews((prevPreviews) => [...prevPreviews, ...selectedPreviews]);
@@ -164,7 +160,7 @@ const Dialog: React.FC = () => {
 
   const handleDeleteMessage = (messageId: number) => {
     try {
-      socket.emit('delete message', messageId, user?.id, dialogUser?.id);
+      socket.emit('delete message', messageId, authUser?.id, dialogUser?.id);
     } catch (e) {
       console.log(e);
     }
@@ -180,35 +176,7 @@ const Dialog: React.FC = () => {
       </Link>
       <div className='messageContainer'>
         {socketMessages.map(message => (
-          <div key={message.id} className={`${styles.userContainer} ${message.read === false ? styles.unread : ''}`}>
-            <div className={styles.userDetails}>
-              <Link href={`/users/${message.Sender?.id}`}>
-                <img
-                  src={`http://localhost:3001/${message.Sender?.image || 'default.jpg'}`}
-                  alt=""
-                  className={styles.avatar}
-                />
-              </Link>
-              <div className={styles.messageContent}>
-                {message.Sender?.id === user?.id ? (
-                  <img src={deleteIcon.src} alt="Preview" className={styles.deleteImage} onClick={() => handleDeleteMessage(message.id)} />
-                ) : <div></div>}
-
-                <div className={styles.userHeader}>
-                  <Link href={`/users/${message.Sender?.id}`}>
-                    <p className={styles.username}>{message.Sender?.username}</p>
-                  </Link>
-                  <p className={styles.date}>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-                <div className={styles.messageContents}>
-                  <p className={styles.message}>{message.content}</p>
-                  {message.images && 
-                    <ImageSlider images={message.images} />
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
+          <Message message={message} authUser={authUser} handleDeleteMessage={handleDeleteMessage} socket={socket} post={post}/>
         ))}
         <div ref={messagesEndRef} />
       </div>

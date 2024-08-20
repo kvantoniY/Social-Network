@@ -1,32 +1,32 @@
-import { fetchPosts, deletePost, createLike, deleteLike, createComment, deleteComment, deleteLikeComment, createLikeComment } from '@/features/posts/postsSlice';
+import { deletePost, createLike, deleteLike, createComment, deleteComment, deleteLikeComment, createLikeComment } from '@/features/posts/postsSlice';
 import { RootState, AppDispatch } from '../../store/store';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';;
 import styles from './Post.module.scss'
-import { fetchUserProfile } from '@/features/auth/authSlice';
-import { fetchUserAPI } from '@/features/users/usersAPI';
 import Comment from '../Comment/Comment';
 import Link from 'next/link';
 import Modal from '@/components/ui/MyModal/Modal';
 import PostModal from '../Modals/ModalPost/ModalPost';
 import { Post as PostType, Comment as CommentType, Like } from '../../types/types';
-
 import ModalLikes from '../Modals/ModalLikes/ModalLikes';
 import {deleteIcon, likeIcon, unLikeIcon, commentsIcon} from '../../assets/'; // Импортируем иконку
-import io from 'socket.io-client';
 import ImageSlider from '../ImageSlider/ImageSlider';
+import ModalShare from '../Modals/ModalShare/ModalShare';
+import { formatDate } from '@/utils/dataUtils';
 
 interface PostProps {
   post: PostType;
+  sendMessage: (userId: number, postId: number, newMessage: string, e: React.FormEvent) => void
+  socket: any
 }
 
-const Post: React.FC<PostProps> = ({ post }) => {
+const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
   const dispatch = useDispatch<AppDispatch>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const [commentText, setCommentText] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalLikesOpen, setIsModalLikesOpen] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
+  const [isModalShareOpen, setIsModalShareOpen] = useState(false);
   const emptyComment: any = {
     id: 0,
     content: '',
@@ -45,25 +45,31 @@ const Post: React.FC<PostProps> = ({ post }) => {
     },
   };
 
-const isoDateString = post.createdAt;
-const dateObject = new Date(isoDateString);
-
-// Получаем день и месяц
-const day = dateObject.getDate();
-const monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-const monthIndex = dateObject.getMonth();
-const monthName = monthNames[dateObject.getMonth()]; // Индексация начинается с 0, поэтому getMonth() возвращает 0 для января
-
-// Получаем время
-const hours = dateObject.getHours().toString().padStart(2, '0'); // Добавляем ведущий ноль, если необходимо
-const minutes = dateObject.getMinutes().toString().padStart(2, '0'); // Добавляем ведущий ноль, если необходимо
-
-// Формируем итоговую строку
-const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
+  const formattedDate = formatDate(post.createdAt);
 
   const handleDeletePost = (postId: number) => {
     dispatch(deletePost(postId));
   };
+
+  const handleDownloadSources = () => {
+    const baseURL = "http://localhost:3001/";
+
+    post.sourceImages.forEach((imageSrc) => {
+        const link = document.createElement('a');
+        link.href = baseURL + imageSrc;
+
+        // Генерация имени файла для скачивания
+        const fileName = imageSrc.split('/').pop() || 'source-image.jpg';
+        link.download = fileName;
+
+        // Обработка клика по ссылке для скачивания файла
+        document.body.appendChild(link);
+        link.click();
+
+        // Удаление ссылки из DOM после скачивания
+        document.body.removeChild(link);
+    });
+};
 
   const handleLike = async (postId: number, userId: number) => {
     if (post.likeStatus) {
@@ -128,19 +134,6 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
       console.log(e)
     }
   }
-
-  useEffect(() => {
-    if (authUser) {
-      const newSocket = io(':3001');
-      setSocket(newSocket);
-      newSocket.emit('join', authUser?.id); // Присоединение к комнате пользователя
-
-      return () => {
-        newSocket.close();
-      };
-    }
-  }, [authUser]);
-
   
   return (
     <div className='post'>
@@ -185,8 +178,15 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
           <img src={commentsIcon.src} alt="comments" className={styles.commentsButton} onClick={() => setIsModalOpen(true)}/>
           <p>{post.Comments ? post.Comments.length : 0}</p>
         </div>
-
+        <div className={styles.shareContainer}>
+          <img src={commentsIcon.src} alt="comments" className={styles.commentsButton} onClick={() => setIsModalShareOpen(true)}/>
+        </div>
       </div>
+      {post.sourceImages.length > 0 && (
+                    <button onClick={handleDownloadSources}>
+                        Download Source Images
+                    </button>
+                )}
       <div className={styles.sendCommentContainer}>
         <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
         <button onClick={() => handleAddComment(post.id, post.userId)} className={styles.sendComment}>Отправить</button>
@@ -216,11 +216,8 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
       >
          <PostModal
         post={post}
-        date={formattedDate}
-        handleDeletePost={handleDeletePost}
-        handleLike={handleLike}
-        handleLikeComment={handleLikeComment}
-        setIsModalLikesOpen={setIsModalLikesOpen}
+        socket={socket}
+        authUser={authUser}
         />
       </Modal>
       <Modal
@@ -229,6 +226,12 @@ const formattedDate = `${day} ${monthName}, ${hours}:${minutes}`;
       >
         <ModalLikes likes={post.Likes} setIsModalOpen={setIsModalLikesOpen}/>
       </Modal>
+      {authUser && (
+        <Modal isOpen={isModalShareOpen} setIsModalOpen={setIsModalShareOpen}>
+          <ModalShare postId={post.id} sendMessage={sendMessage} setIsModalOpen={setIsModalShareOpen}/>
+        </Modal>
+      )}
+
     </div>
   );
 };

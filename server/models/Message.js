@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const User = require('./User');
+const Post = require('./Post');
 
 const Message = sequelize.define('Message', {
   content: {
@@ -11,6 +12,19 @@ const Message = sequelize.define('Message', {
     type: DataTypes.JSON,  // Используем JSON для хранения массива изображений
     defaultValue: [],
     allowNull: true
+    },
+    type: {
+      type: DataTypes.STRING,
+      defaultValue: 'message',
+      allowNull: false
+    },
+    postId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Post,
+        key: 'id'
+      }
     },
   senderId: {
     type: DataTypes.INTEGER,
@@ -38,5 +52,5 @@ const Message = sequelize.define('Message', {
 
 Message.belongsTo(User, { as: 'Sender', foreignKey: 'senderId' });
 Message.belongsTo(User, { as: 'Receiver', foreignKey: 'receiverId' });
-
+Message.belongsTo(Post, { as: 'Post', foreignKey: 'postId' });
 module.exports = Message;

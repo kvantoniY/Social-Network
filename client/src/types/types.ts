@@ -67,7 +67,23 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   images: any;
+  sourceImages: string[];
 }
+export interface Message {
+  id: number;
+  senderId: number;
+  receiverId: number;
+  content: string;
+  type: string;
+  postId?: number | null;
+  Post: Post;
+  images?: string[];
+  createdAt: string;
+  read: boolean;
+  Sender: User;
+  Receiver: User;
+}
+
 export interface Dialog {
   id: number;
   userId1: number;
