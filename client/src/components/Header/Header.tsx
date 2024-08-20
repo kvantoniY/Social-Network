@@ -10,7 +10,7 @@ import ThemeToggle from './ThemeToggle';
 import styles from "./Header.module.scss";
 import { User, Dialog, Notification } from '../../types/types';
 
-import { dialogsIcon, homeIcon, subsIcon, logoutIcon, noticeIcon } from '../../assets/';
+import { dialogsIcon, homeIcon, subsIcon, logoutIcon, noticeIcon, settingsIcon } from '../../assets/';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -153,8 +153,7 @@ const Header: React.FC = () => {
                 <p>{user.username}</p>
                 <img src={logoutIcon.src} alt="logout" onClick={handleLogout} className={styles.logout} />
                 <Link href={`/settings`} className={styles.userContainer}>
-                1
-                  <img src={logoutIcon.src} alt="logout" className={styles.logout} />
+                  <img src={settingsIcon.src} alt="logout" className={styles.logout} />
                 </Link>
               </Link>
             </div>

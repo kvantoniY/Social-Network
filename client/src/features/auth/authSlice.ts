@@ -50,6 +50,18 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async ({ id, oldPassword, newPassword }: { id: number; oldPassword: string; newPassword: string }) => {
+    const response = await axiosInstance.post(`/auth/changePassword`, {
+      id,
+      password: oldPassword,
+      newPassword,
+    });
+    return response.data;
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -109,6 +121,19 @@ const authSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message || null;
         console.log("Failed")
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.error = null;
+        localStorage.setItem('token', action.payload);
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || null;
+
       });
   },
 });

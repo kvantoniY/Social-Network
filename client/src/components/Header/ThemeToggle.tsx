@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { switchThemeLight, switchThemeDark  } from '@/assets';
 
+import styles from './Header.module.scss'
+
 const ThemeToggle = () => {
   const [theme, setTheme] = useState('light');
 
@@ -20,7 +22,7 @@ const ThemeToggle = () => {
 
   return (
     <div onClick={toggleTheme}>
-      {theme === 'light' ? <img src={switchThemeDark.src} alt="Switch To Dark Mode" /> : <img src={switchThemeLight.src} alt="Switch To Light Mode" />}
+      {theme === 'light' ? <img src={switchThemeDark.src} alt="Switch To Dark Mode" className={styles.themeToggle}/> : <img src={switchThemeLight.src} alt="Switch To Light Mode"  className={styles.themeToggle}/>}
     </div>
   );
 };

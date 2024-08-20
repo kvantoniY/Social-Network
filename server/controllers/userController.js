@@ -3,6 +3,7 @@ const BlackList = require('../models/BlackList');
 const uuid = require("uuid");
 const path = require("path");
 const Follow = require('../models/Follow');
+const UserSettings = require('../models/UserSettings');
 
 exports.getUserById = async (req, res) => {
   try {
@@ -185,4 +186,53 @@ exports.deleteBlackListUser = async (req, res) => {
   }
 };
 
+exports.getUserSettings = async (req, res) => {
+  try {
+      const settings = await UserSettings.findOne({ where: { userId: req.userId } });
+      if (!settings) {
+          return res.status(404).json({ error: 'Settings not found' });
+      }
+      res.status(200).json(settings);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateUserSettings = async (req, res) => {
+  const {
+      notificationSound,
+      messageSound,
+      likeNotifications,
+      commentNotifications,
+      followerNotifications,
+      privateProfile,
+      canMessage,
+      canComment,
+  } = req.body;
+
+  try {
+      const settings = await UserSettings.findOne({ where: { userId: req.userId } });
+
+      if (!settings) {
+          return res.status(404).json({ error: 'Settings not found' });
+      }
+
+      // Обновляем настройки только если они переданы в запросе
+      settings.notificationSound = notificationSound ?? settings.notificationSound;
+      settings.messageSound = messageSound ?? settings.messageSound;
+      settings.likeNotifications = likeNotifications ?? settings.likeNotifications;
+      settings.commentNotifications = commentNotifications ?? settings.commentNotifications;
+      settings.followerNotifications = followerNotifications ?? settings.followerNotifications;
+      settings.privateProfile = privateProfile ?? settings.privateProfile;
+      settings.canMessage = canMessage ?? settings.canMessage;
+      settings.canComment = canComment ?? settings.canComment;
+
+      // Сохраняем обновленные настройки
+      await settings.save();
+
+      res.status(200).json(settings);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
 

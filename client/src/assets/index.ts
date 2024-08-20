@@ -14,6 +14,7 @@ import subsIcon from './subs.svg'
 import editIcon from './edit.svg'
 import arrowLeftIcon from './arrowLeftIcon.png'
 import arrowRightIcon from './arrowRightIcon.png'
+import settingsIcon from './settingsIcon.png'
 
 export {
   deleteIcon,
@@ -31,5 +32,6 @@ export {
   noticeIcon,
   editIcon,
   arrowLeftIcon,
-  arrowRightIcon
+  arrowRightIcon,
+  settingsIcon
 };
