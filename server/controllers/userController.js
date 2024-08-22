@@ -197,6 +197,19 @@ exports.getUserSettings = async (req, res) => {
       res.status(500).json({ error: error.message });
   }
 };
+exports.getCurrentUserSettings = async (req, res) => {
+  try {
+      const {id} = req.body;
+      console.log(`current id ${id}`)
+      const settings = await UserSettings.findOne({ where: { userId: id } });
+      if (!settings) {
+          return res.status(404).json({ error: 'Settings not found' });
+      }
+      res.status(200).json(settings);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
 
 exports.updateUserSettings = async (req, res) => {
   const {

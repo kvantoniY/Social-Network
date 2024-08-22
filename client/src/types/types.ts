@@ -1,8 +1,24 @@
+export interface UserSetting {
+  id: number;
+  userId: number;
+  privateProfile: boolean;
+  canMessage: string;
+  canComment: string;
+  notificationSound: boolean;
+  messageSound: boolean;
+  likeNotifications: boolean;
+  commentNotifications: boolean;
+  followerNotifications: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface User {
   id: number;
   username: string;
   email: string;
   about?: string;
+  UserSetting: UserSetting;
   role: 'User' | 'Admin';
   image: string;
   createdAt: string;

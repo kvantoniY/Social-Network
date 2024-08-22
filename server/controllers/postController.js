@@ -5,6 +5,7 @@ const Comment = require("../models/Comment");
 const uuid = require("uuid");
 const path = require("path");
 const LikeCom = require("../models/LikeCom");
+const UserSettings = require("../models/UserSettings");
 
 exports.createPost = async (req, res) => {
   try {
@@ -121,9 +122,10 @@ exports.getPosts = async (req, res) => {
           model: Like,
           include: [{ model: User }] // Загружаем лайки к посту и связанные с ними пользователи
         },
-        {
-          model: User
-        },
+        { 
+          model: User,
+          include: [{model: UserSettings}]
+         }
       ],
     });
 
@@ -174,9 +176,10 @@ exports.getUserPosts = async (req, res) => {
           model: Like,
           include: [{ model: User }], // Загружаем лайки к посту и связанные с ними посты
         },
-        {
+        { 
           model: User,
-        },
+          include: [{model: UserSettings}]
+         }
       ],
     });
     const postsWithLikeStatus = posts.map(post => {

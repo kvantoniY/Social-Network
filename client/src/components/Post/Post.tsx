@@ -86,6 +86,8 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
     } else {
       try {
         dispatch(createLike(postId));
+        console.log(post.User.UserSetting.likeNotifications)
+        if (post.User?.UserSetting?.likeNotifications) {
         const notificationData = {
           type: 'like',
           userId: Number(userId),
@@ -93,6 +95,9 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
           postId: postId,
         };
         socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+        console.log(post.User.UserSetting?.likeNotifications)
+        }
+        console.log(post.User.UserSetting)
       } catch (e) {
         console.log(e)
       }
@@ -106,6 +111,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
     } else {
       try {
         dispatch(createLikeComment(commentId));
+        if (post.User?.UserSetting?.likeNotifications) {
         const notificationData = {
           type: 'likeCom',
           userId: Number(userId),
@@ -114,6 +120,8 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
           commentId: commentId,
         };
         socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+        }
+        
       } catch (e) {
         console.log(e);
       }
@@ -132,6 +140,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
     try {
       dispatch(createComment({ postId, commentText }))
       setCommentText('')
+      if (post.User?.UserSetting?.commentNotifications) {
       const notificationData = {
         type: 'comment',
         userId: Number(userId),
@@ -139,6 +148,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
         postId: postId,
       };
       socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+    }
     } catch (e) {
       console.log(e)
     }

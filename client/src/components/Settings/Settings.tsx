@@ -19,14 +19,21 @@ const Settings: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const [profileVisibility, setProfileVisibility] = useState<string>('Все пользователи');
-    const [messagePrivacy, setMessagePrivacy] = useState<string>('Все пользователи');
-    const [commentPrivacy, setCommentPrivacy] = useState<string>('Все пользователи');
+        // Добавление состояний для обработки ошибок и успешных сообщений
+        const [passwordError, setPasswordError] = useState<string | null>(null);
+        const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+
+    // Правильные переменные, соответствующие модели на сервере
+    const [privateProfile, setPrivateProfile] = useState<string>('Все пользователи');
+    const [canMessage, setCanMessage] = useState<string>('Все пользователи');
+    const [canComment, setCanComment] = useState<string>('Все пользователи');
     const [notificationSound, setNotificationSound] = useState<boolean>(true);
     const [messageSound, setMessageSound] = useState<boolean>(true);
     const [likeNotifications, setLikeNotifications] = useState<boolean>(true);
     const [commentNotifications, setCommentNotifications] = useState<boolean>(true);
     const [followerNotifications, setFollowerNotifications] = useState<boolean>(true);
+    const [updateStatus, setUpdateStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [updateError, setUpdateError] = useState<string | null>(null);
 
     useEffect(() => {
         dispatch(fetchUserProfile());
@@ -35,9 +42,9 @@ const Settings: React.FC = () => {
 
     useEffect(() => {
         if (settings) {
-            setProfileVisibility(settings.profileVisibility);
-            setMessagePrivacy(settings.messagePrivacy);
-            setCommentPrivacy(settings.commentPrivacy);
+            setPrivateProfile(settings.privateProfile ? 'Взаимные подписчики' : 'Все пользователи');
+            setCanMessage(settings.canMessage);
+            setCanComment(settings.canComment);
             setNotificationSound(settings.notificationSound);
             setMessageSound(settings.messageSound);
             setLikeNotifications(settings.likeNotifications);
@@ -52,30 +59,56 @@ const Settings: React.FC = () => {
     };
 
     const handlePasswordChange = () => {
+        // Сброс сообщений
+        setPasswordError(null);
+        setPasswordSuccess(null);
+
+        // Проверка совпадения паролей
         if (newPassword !== confirmPassword) {
-            alert("Пароли не совпадают");
+            setPasswordError("Пароли не совпадают");
             return;
         }
-        if (authUser?.id) {
-            dispatch(changePassword({ id: authUser.id, oldPassword, newPassword }));
+
+        // Проверка длины нового пароля
+        if (newPassword.length < 6) {
+            setPasswordError("Пароль должен содержать не менее 6 символов");
+            return;
         }
-        if(!error) {
-            setShowPasswordForm(false);
+
+        if (authUser?.id) {
+            dispatch(changePassword({ id: authUser.id, oldPassword, newPassword }))
+                .unwrap()
+                .then(() => {
+                    setPasswordSuccess("Пароль успешно изменен");
+                    setShowPasswordForm(false); // Закрытие формы после успешного изменения
+                })
+                .catch((err) => {
+                    setPasswordError(err.message || "Ошибка при изменении пароля");
+                });
         }
     };
 
-    const handleUpdateSettings = () => {
+    const handleUpdateSettings = async () => {
         const updatedSettings = {
-            profileVisibility,
-            messagePrivacy,
-            commentPrivacy,
+            privateProfile: privateProfile === 'Взаимные подписчики',
+            canMessage,
+            canComment,
             notificationSound,
             messageSound,
             likeNotifications,
             commentNotifications,
             followerNotifications,
         };
-        dispatch(updateUserSettings(updatedSettings));
+
+        try {
+            setUpdateStatus('loading');
+            await dispatch(updateUserSettings(updatedSettings)).unwrap();
+            setUpdateStatus('success');
+            setUpdateError(null);
+        } catch (err: any) {
+            setUpdateStatus('error');
+            setUpdateError(err.message || 'Ошибка при обновлении настроек');
+        }
     };
 
     return (
@@ -101,27 +134,31 @@ const Settings: React.FC = () => {
                 <h2>Закрытый профиль</h2>
                 <div className={styles.optionContainer}>
                     <p>Кто может просматривать мой профиль</p>
-                    <select value={profileVisibility} onChange={(e) => setProfileVisibility(e.target.value)}>
+                    <select value={privateProfile} onChange={(e) => setPrivateProfile(e.target.value)}>
                         <option>Все пользователи</option>
                         <option>Взаимные подписчики</option>
                     </select>
                 </div>
                 <div className={styles.optionContainer}>
                     <p>Кто может писать сообщения</p>
-                    <select value={messagePrivacy} onChange={(e) => setMessagePrivacy(e.target.value)}>
-                        <option>Все пользователи</option>
-                        <option>Взаимные подписчики</option>
+                    <select value={canMessage} onChange={(e) => setCanMessage(e.target.value)}>
+                        <option value="everyone">Все пользователи</option>
+                        <option value="mutuals">Взаимные подписчики</option>
+                        <option value="no_one">Никто</option>
                     </select>
                 </div>
                 <div className={styles.optionContainer}>
                     <p>Кто может комментировать мои посты</p>
-                    <select value={commentPrivacy} onChange={(e) => setCommentPrivacy(e.target.value)}>
-                        <option>Все пользователи</option>
-                        <option>Взаимные подписчики</option>
-                        <option>Никто</option>
+                    <select value={canComment} onChange={(e) => setCanComment(e.target.value)}>
+                        <option value="everyone">Все пользователи</option>
+                        <option value="mutuals">Взаимные подписчики</option>
+                        <option value="no_one">Никто</option>
                     </select>
                 </div>
                 <button onClick={handleUpdateSettings}>Сохранить изменения</button>
+                {updateStatus === 'loading' && <p>Сохранение...</p>}
+                {updateStatus === 'success' && <p>Настройки успешно обновлены</p>}
+                {updateStatus === 'error' && <p>{updateError}</p>}
             </div>
 
             <div className={styles.settingContainer}>
@@ -152,11 +189,14 @@ const Settings: React.FC = () => {
                             <button onClick={() => setShowPasswordForm(false)}>Отмена</button>
                             <button onClick={handlePasswordChange}>Готово</button>
                         </div>
-                        {status === 'loading' && <p>Loading...</p>}
-                        {error && <p>{error}</p>}
+
+                        {/* Вывод сообщения об ошибке */}
+                        {passwordError && <p className={styles.error}>{passwordError}</p>}
+                        {passwordSuccess && <p className={styles.success}>{passwordSuccess}</p>}
                     </div>
                 )}
             </div>
+
 
             <div className={styles.settingContainer}>
                 <h2>Уведомления</h2>
@@ -205,7 +245,7 @@ const Settings: React.FC = () => {
                     </label>
                 </div>
                 <div className={styles.optionContainer}>
-                    <p>Получать уведомления о подписках</p>
+                    <p>Получать уведомления о подписчиках</p>
                     <label className={styles.switch}>
                         <input 
                             type="checkbox" 
@@ -215,14 +255,13 @@ const Settings: React.FC = () => {
                         <span className={styles.slider}></span>
                     </label>
                 </div>
-                <button onClick={handleUpdateSettings}>Сохранить изменения</button>
             </div>
 
-            <div onClick={handleLogout} className={styles.settingContainer}>
-                <div className={styles.optionContainer}>
-                    <span>Выйти из аккаунта</span>
-                    <img src={logoutIcon.src} alt="logout" className={styles.logout} />
-                </div>
+            <div className={styles.settingContainer}>
+                <h2>Завершить сеанс</h2>
+                <button onClick={handleLogout} className={styles.logoutButton}>
+                    <img src={logoutIcon.src} alt="Выйти" className={styles.logout}/>
+                </button>
             </div>
         </div>
     );

@@ -23,6 +23,14 @@ export const fetchUserSettings = createAsyncThunk('settings/getUserSettings', as
     }
 });
 
+export const fetchCurrentUserSettings = createAsyncThunk(
+    'settings/getCurrentUserSettings',
+     async (id: number) => {
+        console.log(`current id: ${id}`)
+            const response = await axiosInstance.post('/users/getCurrentUserSettings', {id});
+            return response.data;
+    });
+
 export const updateUserSettings = createAsyncThunk('settings/updateUserSettings', async (settings: any, { rejectWithValue }) => {
     try {
         const response = await axiosInstance.put('/users/updateUserSettings', settings);
@@ -46,6 +54,17 @@ const settingsSlice = createSlice({
                 state.settings = action.payload;
             })
             .addCase(fetchUserSettings.rejected, (state, action: PayloadAction<any>) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            .addCase(fetchCurrentUserSettings.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchCurrentUserSettings.fulfilled, (state, action: PayloadAction<any>) => {
+                state.status = 'succeeded';
+                state.settings = action.payload;
+            })
+            .addCase(fetchCurrentUserSettings.rejected, (state, action: PayloadAction<any>) => {
                 state.status = 'failed';
                 state.error = action.payload;
             })

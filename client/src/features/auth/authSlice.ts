@@ -128,7 +128,7 @@ const authSlice = createSlice({
       .addCase(changePassword.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.error = null;
-        localStorage.setItem('token', action.payload);
+        localStorage.setItem('token', action.payload.token);
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.status = 'failed';

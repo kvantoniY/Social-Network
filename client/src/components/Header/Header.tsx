@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store/store';
 import { fetchUserProfile, logout } from '../../features/auth/authSlice';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { checkToken } from '@/features/auth/authAPI';
 import io from 'socket.io-client';
 import Link from 'next/link';
@@ -11,21 +11,29 @@ import styles from "./Header.module.scss";
 import { User, Dialog, Notification } from '../../types/types';
 
 import { dialogsIcon, homeIcon, subsIcon, logoutIcon, noticeIcon, settingsIcon } from '../../assets/';
+import { fetchUserSettings } from '@/features/settings/settingsSlice';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
+  const { status, error, settings } = useSelector((state: RootState) => state.settings);
   const [dialogs, setDialogs] = useState<Dialog[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationsRead, setNotificationsRead] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [socket, setSocket] = useState<any>(null);
+  const previousDialogsRef = useRef<Dialog[]>([]); // Храним предыдущие диалоги
+
+  // Создаем ссылки на аудио элементы
+  const messageSoundRef = useRef<HTMLAudioElement | null>(null);
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     dispatch(checkToken() as any);
     dispatch(fetchUserProfile())
+    dispatch(fetchUserSettings());
   }, [dispatch]);
 
   useEffect(() => {
@@ -35,9 +43,18 @@ const Header: React.FC = () => {
       newSocket.emit('join', user.id); // Присоединение к комнате пользователя
 
       newSocket.on('dialogs update', (updatedDialogs: Dialog[]) => {
-        setDialogs(updatedDialogs);
         const totalUnreadCount = updatedDialogs.reduce((acc, dialog) => acc + dialog.unreadCount, 0);
-        setUnreadCount(totalUnreadCount); // Обновляем общее количество непрочитанных сообщений
+
+        // Проверка на увеличение количества непрочитанных сообщений
+        const prevUnreadCount = previousDialogsRef.current.reduce((acc, dialog) => acc + dialog.unreadCount, 0);
+        if (totalUnreadCount > prevUnreadCount && messageSoundRef.current && settings && settings.messageSound) {
+          messageSoundRef.current.play();
+        }
+
+        // Сохраняем обновленные диалоги и количество непрочитанных
+        previousDialogsRef.current = updatedDialogs; // Сохраняем текущее состояние диалогов
+        setDialogs(updatedDialogs);
+        setUnreadCount(totalUnreadCount);
       });
 
       // Запрос на получение текущих диалогов
@@ -46,13 +63,17 @@ const Header: React.FC = () => {
       newSocket.on('new_notification', (notification: Notification) => {
         setNotifications((prev) => [notification, ...prev]);
         setNotificationsRead(notificationsRead => notificationsRead + 1)
+
+        // Воспроизведение звука для новых уведомлений
+        if (notificationSoundRef.current && settings && settings.notificationSound) {
+          notificationSoundRef.current.play();
+        }
       });
 
       newSocket.on('notifications', (notifications: Notification[]) => {
         setNotifications(notifications);
         let unreadNotifications = notifications.filter(notification => notification.isRead === false)
         setNotificationsRead(unreadNotifications.length)
-        console.log(notifications)
       });
 
       newSocket.emit('get_notifications', user.id);
@@ -110,30 +131,28 @@ const Header: React.FC = () => {
                     
                     {notifications.length > 0 ? (
                       notifications.map((notification) => (
-                        <div>
+                        <div key={notification.id}>
                           {notification.type === 'like' ? (
-                            <div key={notification.id} className={styles.notification}>
+                            <div className={styles.notification}>
                               Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> 
                               поставил лайк на ваш пост <img src={`http://localhost:3001/` + notification.Post?.images[0] || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}
                             </div>
                           ) : notification.type === 'comment' ? (
-                              <div key={notification.id} className={styles.notification}>
+                              <div className={styles.notification}>
                                 Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> написал комментарий под ваш пост 
                                 <div><img src={`http://localhost:3001/` + notification.Post?.images[0] || "default.jpg"} alt="" /> {notification.Post ? getPostContentSnippet(notification.Post.content) : ''}</div>
                               </div>
                           ) : notification.type === 'likeCom' ? (
-                            <div key={notification.id} className={styles.notification}>
+                            <div className={styles.notification}>
                                Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> 
                                лайкнул ваш комментарий {notification.Comment ? getPostContentSnippet(notification.Comment.content) : ''}
                             </div>
                           ) : (
-                                <div key={notification.id} className={styles.notification}>
+                                <div className={styles.notification}>
                                   Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username} </Link> подписался на вас
                                 </div>
                           )}
-  
                         </div>
-
                       ))
                     ) : (
                       <p>No new notifications</p>
@@ -162,6 +181,10 @@ const Header: React.FC = () => {
           <button onClick={() => router.push('/auth')}>Войти</button>
         )}
       </nav>
+
+      {/* Аудио элементы для уведомлений */}
+      <audio ref={messageSoundRef} src="/sounds/message.mp3" preload="auto" />
+      <audio ref={notificationSoundRef} src="/sounds/notification.mp3" preload="auto" />
 
     </header>
   );

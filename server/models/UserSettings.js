@@ -47,5 +47,6 @@ const UserSettings = sequelize.define('UserSettings', {
 });
 
 UserSettings.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(UserSettings, { foreignKey: 'userId' });
 
 module.exports = UserSettings;

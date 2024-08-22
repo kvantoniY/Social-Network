@@ -15,6 +15,8 @@ import Modal from '../ui/MyModal/Modal';
 import PostModal from '../Modals/ModalPost/ModalPost';
 import { formatDate } from '@/utils/dataUtils';
 import Message from '../Message/Message';
+import { fetchCurrentUserSettings } from '@/features/settings/settingsSlice';
+import { searchCurrentFollower } from '@/features/follows/followSlice';
 
 const Dialog: React.FC = () => {
   const router = useRouter();
@@ -25,9 +27,11 @@ const Dialog: React.FC = () => {
   const [socket, setSocket] = useState<any>(null);
   const [socketMessages, setSocketMessages] = useState<MessageType[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const { followStatus, followers, following } = useSelector((state: RootState) => state.follows);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const dispatch = useDispatch<AppDispatch>();
+  const { settings } = useSelector((state: RootState) => state.settings);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [blackListStatus, setBlackListStatus] = useState(false);
@@ -38,7 +42,8 @@ const Dialog: React.FC = () => {
   useEffect(() => {
     if (userId && authUser) {
       dispatch(fetchUser(Number(userId)));
-
+      dispatch(fetchCurrentUserSettings(Number(userId)))
+      dispatch(searchCurrentFollower(Number(userId)));
       const newSocket = io(':3001');
       setSocket(newSocket);
       newSocket.emit('join', authUser?.id);
@@ -185,6 +190,7 @@ const Dialog: React.FC = () => {
       ) : isBlackListStatus ? (
         <p>Вы добавили пользователя в чёрный список</p>
       ) : (
+        (settings && settings.canMessage === 'mutuals' && followStatus === 3) || (settings && settings.canMessage === "everyone") ? (
         <>
           <form onSubmit={sendSocketMessage} className='createMessage'>
             <div
@@ -225,6 +231,11 @@ const Dialog: React.FC = () => {
             </div>
           </form>
         </>
+      ) : (
+        <>
+        <div>Этот пользователь ограничил возможность писать ему сообщения</div>
+        </>
+      )
       )}
     </div>
   );

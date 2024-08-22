@@ -17,6 +17,7 @@ import io from 'socket.io-client';
 import axiosInstance from '@/utils/axiosInstance';
 import { Dialog } from '@/types/types';
 import { AddBlackListAPI, CheckBlackListAPI, DeleteBlackListAPI } from '@/features/users/usersAPI';
+import { fetchCurrentUserSettings } from '@/features/settings/settingsSlice';
 
 const UserPage = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const UserPage = () => {
   const { followStatus, followers, following } = useSelector((state: RootState) => state.follows);
   const { posts } = useSelector((state: RootState) => state.posts);
   const authUser = useSelector((state: RootState) => state.auth.user);
+  const { settings } = useSelector((state: RootState) => state.settings);
   const [dialogId, setDialogId] = useState(null);
   const [about, setAbout] = useState('');
   const [image, setImage] = useState<any>(null);
@@ -65,6 +67,7 @@ const UserPage = () => {
       dispatch(searchFollowers(Number(id)));
       dispatch(searchFollowing(Number(id)));
       dispatch(searchCurrentFollower(Number(id)));
+      dispatch(fetchCurrentUserSettings(Number(id)))
       const findDialogId = async () => {
         try {
           const response = await axiosInstance.post('/messages/dialog', { id: numericId })
@@ -138,12 +141,14 @@ const UserPage = () => {
   const handleFollow = async () => {
     try {
       await dispatch(follow(Number(id)));
+      if (settings && settings.followerNotifications) {
       const notificationData = {
         type: 'follow',
         userId: Number(id),
         actorId: Number(authUser?.id),
       };
       socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+      }
     } catch (e) {
       console.log(e);
     }
@@ -245,13 +250,13 @@ const UserPage = () => {
                 {followStatus === 3 && (
                   <div>
                     <button onClick={handleUnFollow}>Отписаться</button>
-                    <Link href={`/dialogs/${user.id}`}>Написать</Link>
                   </div>
                 )}
                 {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
                   </>
                 )}
-                
+                {settings.canMessage === "everyone" && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
+                {settings.canMessage === "mutuals" && followStatus === 3 && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
                 {isBlackListStatus ? <div onClick={() => handleBlackList("delete")}>Убрать ЧС</div> : <div onClick={() => handleBlackList("add")}>Добавить в ЧС</div>}
                 
               </div>
@@ -277,20 +282,26 @@ const UserPage = () => {
       <div>
         {user && authUser?.id === user.id && <CreatePost />}
         {blackListStatus ? (
-          <>
-            <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
-          </>
-        ) : (
-          <>
-            {posts.length > 0 ? (
-              posts.map((post) => (
-                <Post key={post.id} post={post} socket={socket} sendMessage={sendMessage}/>
-              ))
-            ) : (
-              <p>No posts available</p>
-            )}
-          </>
-        )}
+  <>
+    <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
+  </>
+) : ( // Здесь идет проверка на черный список
+  (settings && settings.privateProfile === true && followStatus === 3) || (settings && settings.privateProfile === false) ? (
+    <>
+      {posts.length > 0 ? (
+        posts.map((post) => (
+          <Post key={post.id} post={post} socket={socket} sendMessage={sendMessage} />
+        ))
+      ) : (
+        <p>No posts available</p>
+      )}
+    </>
+  ) : (
+    <>
+      
+    </>
+  )
+)}
 
       </div>
     </div>
