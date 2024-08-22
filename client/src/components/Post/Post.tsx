@@ -13,6 +13,7 @@ import {deleteIcon, likeIcon, unLikeIcon, commentsIcon} from '../../assets/'; //
 import ImageSlider from '../ImageSlider/ImageSlider';
 import ModalShare from '../Modals/ModalShare/ModalShare';
 import { formatDate } from '@/utils/dataUtils';
+import axiosInstance from '@/utils/axiosInstance';
 
 interface PostProps {
   post: PostType;
@@ -27,6 +28,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalLikesOpen, setIsModalLikesOpen] = useState(false);
   const [isModalShareOpen, setIsModalShareOpen] = useState(false);
+  const [followStatus, setFollowStatus] = useState<any>(null)
   const emptyComment: any = {
     id: 0,
     content: '',
@@ -45,6 +47,23 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
     },
   };
 
+  useEffect(() => {
+    console.log(post.User?.UserSetting?.canComment)
+    const fetchFollowStatus = async () => {
+      if (post && post.User?.UserSetting?.canComment === 'mutuals') {
+        try {
+          const response = await axiosInstance.post(`/follows/searchCurrentFollower/${post.User.id}`);
+          setFollowStatus(response.data)
+          console.log(`Follow status: ${followStatus}`)
+          console.log(`Post User Settings: ${post.User.UserSetting.canComment}`)
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    }
+    fetchFollowStatus()
+  }, [post])
+  
   const formattedDate = formatDate(post.createdAt);
 
   const handleDeletePost = (postId: number) => {
@@ -205,11 +224,15 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
                     <button onClick={handleDownloadSources}>
                         Download Source Images
                     </button>
-                )}
-      <div className={styles.sendCommentContainer}>
-        <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
-        <button onClick={() => handleAddComment(post.id, post.userId)} className={styles.sendComment}>Отправить</button>
-      </div>
+      )}
+{(post.User?.UserSetting?.canComment === 'everyone' || 
+  (post.User?.UserSetting?.canComment === 'mutuals' && followStatus === 3) || (authUser?.id === post.User.id)) && (
+  <div className={styles.sendCommentContainer}>
+    <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
+    <button onClick={() => handleAddComment(post.id, post.userId)} className={styles.sendComment}>Отправить</button>
+  </div>
+)}
+
       <div>
         {post.Comments?.length > 0 ? (
           <>

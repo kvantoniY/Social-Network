@@ -120,6 +120,7 @@ exports.allBlackListUsers = async (req, res) => {
 
 exports.myBlackListUsers = async (req, res) => {
   try {
+    // Получаем пользователей, которых заблокировал текущий пользователь
     const blockedUsers = await BlackList.findAll({
       where: { userId: req.userId },
       include: [
@@ -130,6 +131,7 @@ exports.myBlackListUsers = async (req, res) => {
       ],
     });
 
+    // Получаем пользователей, которые заблокировали текущего пользователя
     const usersWhoBlockedMe = await BlackList.findAll({
       where: { blUserId: req.userId },
       include: [
@@ -140,9 +142,12 @@ exports.myBlackListUsers = async (req, res) => {
       ],
     });
 
- 
-    // Объединяем оба списка
-    const blackList = {blockedUsers: blockedUsers.length > 0 ? [...blockedUsers] : [], usersWhoBlockedMe: blockedUsers.length > 0 ? [...usersWhoBlockedMe] : []};
+    // Формируем правильную структуру ответа
+    const blackList = {
+      blockedUsers: blockedUsers.map(bl => bl.BlockingUsers),
+      usersWhoBlockedMe: usersWhoBlockedMe.map(bl => bl.BlockedUsers)
+    };
+
     console.log('Blocked Users:', JSON.stringify(blackList, null, 2));
     res.status(200).json(blackList);
   } catch (error) {

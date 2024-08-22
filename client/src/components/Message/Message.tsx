@@ -87,15 +87,15 @@ const Message: React.FC<any> = ({message, authUser, handleDeleteMessage, socket,
                     <div>
                       
                         <div className={styles.userContainer}>
-                        <Link href={`/users/${message.Post.User.id}`}>
+                        <Link href={`/users/${message?.Post?.User?.id}`}>
                           <img
-                            src={`http://localhost:3001/` + message.Post.User?.image || "default.jpg"}
+                            src={`http://localhost:3001/` + message?.Post?.User?.image || "default.jpg"}
                             alt=""
                             className={styles.avatar}
                           />
-                          <p className={styles.username}>{message.Post.User?.username}</p>
+                          <p className={styles.username}>{message?.Post.User?.username}</p>
                           </Link>
-                          <p onClick={handleOpenModal}>{formatDate(message.Post.createdAt)}</p>
+                          <p onClick={handleOpenModal}>{formatDate(message?.Post.createdAt)}</p>
                         </div>
                       
 

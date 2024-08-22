@@ -142,17 +142,16 @@ const FollowsPage = () => {
       ) : followsList === 'otherBlackList' ? (
         <>
           <p>Вы в чёрном списке:</p>
-          
           {usersWhoBlockedMe.map((user: any) => (
-            <Link href={`/users/${user.BlockedUsers?.id}`} key={user.BlockedUsers?.id}>
-            <div key={user.BlockedUsers?.id} className={styles.followContainer}>
-              <img
-                src={`http://localhost:3001/${user?.BlockedUsers?.image || "default.jpg"}`}
-                alt=""
-                className={styles.avatar}
-              />
-              <p>{user.BlockedUsers?.username}</p>
-            </div>
+            <Link href={`/users/${user?.id}`} key={user?.id}>
+              <div className={styles.followContainer}>
+                <img
+                  src={`http://localhost:3001/${user?.image || "default.jpg"}`}
+                  alt=""
+                  className={styles.avatar}
+                />
+                <p>{user.username}</p>
+              </div>
             </Link>
           ))}
         </>
@@ -160,15 +159,15 @@ const FollowsPage = () => {
         <>
           <p>У вас в чёрном списке:</p>
           {blockedUsers.map((user: any) => (
-            <Link href={`/users/${user.BlockingUsers?.id}`} key={user.BlockingUsers?.id}>
-            <div key={user.BlockingUsers?.id} className={styles.followContainer}>
-              <img
-                src={`http://localhost:3001/${user.BlockingUsers?.image || "default.jpg"}`}
-                alt=""
-                className={styles.avatar}
-              />
-              <p>{user.BlockingUsers?.username}</p>
-            </div>
+            <Link href={`/users/${user?.id}`} key={user?.id}>
+              <div className={styles.followContainer}>
+                <img
+                  src={`http://localhost:3001/${user?.image || "default.jpg"}`}
+                  alt=""
+                  className={styles.avatar}
+                />
+                <p>{user.username}</p>
+              </div>
             </Link>
           ))}
         </>

@@ -255,8 +255,8 @@ const UserPage = () => {
                 {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
                   </>
                 )}
-                {settings.canMessage === "everyone" && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
-                {settings.canMessage === "mutuals" && followStatus === 3 && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
+                {settings?.canMessage === "everyone" && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
+                {settings?.canMessage === "mutuals" && followStatus === 3 && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
                 {isBlackListStatus ? <div onClick={() => handleBlackList("delete")}>Убрать ЧС</div> : <div onClick={() => handleBlackList("add")}>Добавить в ЧС</div>}
                 
               </div>
