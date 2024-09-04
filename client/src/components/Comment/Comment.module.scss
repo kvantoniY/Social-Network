@@ -1,116 +1,95 @@
-@import '../../styles/mixins';
-
-.postContent {
+.comment {
+  position: relative; /* Для абсолютного позиционирования кнопки удаления */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Сразу размещаем контент и действия на разных концах */
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
   margin-top: 10px;
+  border: 1px solid #ccc;
+  
 }
+
+.userContainer {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.commentContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.date {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.text {
+  margin-top: 5px;
+  font-size: 15px;
+  
+}
+
+.actions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-left: auto; /* Сдвигаем блок с лайками и удалением к правому краю */
+}
+
+.likeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: absolute;
+  bottom: 2px;
+  right: 2px; /* Удаление в правом верхнем углу */
+  font-size: 15px;
+}
+
 .likeButton {
-  margin-right: 10px;
-  max-width: 20px;
-  max-height: 20px;
   cursor: pointer;
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
 }
-.commentsButton {
-margin-right: 10px;
-max-width: 20px;
-max-height: 20px;
-cursor: pointer;
+
+.likeButton:hover {
+  color: #ff5a5f;
 }
 
 .deleteButton {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  max-width: 25px;
-  max-height: 25px;
+  top: 2px;
+  right: 2px; /* Удаление в правом верхнем углу */
+  width: 17px;
+  height: 17px;
   cursor: pointer;
-}
-.likeComContainer {
-  display: flex;
-  margin-top: 40px;
-}
-.likeContainer {
-padding: 10px;
-background-color: rgb(206, 206, 206);
-border-radius: 10px;
-display: flex;
-align-items: center;
-}
-.commentsContainer {
-margin-left: 10px;
-padding: 10px;
-background-color: rgb(206, 206, 206);
-border-radius: 10px;
-display: flex;
-align-items: center;
-}
-
-.sendComment {
-margin-left: 10px;
-border-radius: 10px;
-}
-.sendCommentContainer {
-margin-top: 10px;
-display: flex;
-align-items: center;
-}
-
-.input { 
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  width: 100%;
-}
-.input:focus {
-outline: none;
-}
-
-.userContainer {
-  display: grid;
-  grid-template-columns: auto 1fr; /* Первая колонка для аватара, вторая колонка занимает оставшееся пространство */
-  grid-template-rows: auto auto; /* Две строки для никнейма и даты */
-  row-gap: 0px;
-  column-gap: 10px;
-  align-items: center; /* Выравнивание элементов по верхнему краю */
-  grid-template-areas: 
-  "avatar username"
-  "avatar date";
-}
-
-.avatar {
-  grid-area: avatar; /* Позиция аватара в сетке */
-  display: block; /* Убираем отступы по умолчанию */
-  width: 45px; /* Задайте ширину */
-  height: 45px; /* Задайте высоту */
-  border-radius: 50%; /* Сделает контейнер круглым */
-  object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
-}
-
-
-.username {
-  grid-area: username; /* Позиция никнейма в сетке */
-}
-
-.date {
-  grid-area: date; /* Позиция даты в сетке */
-  font-size: 12px;
-}
-.postImage {
-  margin-top: 15px;
-  max-width: 1080px;
-  max-height: 520px;
-}
-
-.showMoreComments {
-margin-left: 10px;
-color: rgb(152, 145, 255) !important;
-cursor: pointer;
-}
-.likeButton {
-  margin-right: 10px;
-  max-width: 20px;
-  max-height: 20px;
-  cursor: pointer;
-}
-.likeContainer {
-  @include likeContainer;
 }

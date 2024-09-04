@@ -1,63 +1,68 @@
 .sliderContainer {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: auto;
-    overflow: hidden;
-  }
-  
-  .imageContainer {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    position: relative;
-    width: 100%;
-    height: 400px; /* Фиксированная высота для всех изображений */
-  }
-  
-  .image {
-    min-width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  
-  .active {
-    opacity: 1;
-    position: relative;
-  }
-  
-  .prevButton, .nextButton {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    z-index: 2;
-    border-radius: 50%;
-  }
-  
-  .prevButton {
-    left: 10px;
-  }
-  
-  .nextButton {
-    right: 10px;
-  }
-  
-  .prevButton:hover, .nextButton:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-  
-  .img_modal {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-  
+  position: relative;
+  display: flex;
+  justify-content: flex-start; /* Выравнивание по левому краю */
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto; /* Центрирование */
+  overflow: hidden;
+}
+
+.imageContainer {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+  height: 400px; /* Фиксированная высота */
+}
+
+.image {
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.active {
+  opacity: 1;
+  position: relative;
+}
+
+.prevButton, .nextButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 15px; /* Увеличенные кнопки */
+  cursor: pointer;
+  z-index: 2;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
+.prevButton:hover, .nextButton:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.img_modal {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}

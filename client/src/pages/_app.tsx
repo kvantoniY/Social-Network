@@ -13,7 +13,6 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     const checkAuth = async () => {
       try {
         await axiosInstance.get('/auth/checkToken'); // Эндпоинт для проверки аутентификации
-        console.log("TOKEN GOOF")
       } catch (error) {
         console.log(error)
         if (router.pathname !== '/auth') {

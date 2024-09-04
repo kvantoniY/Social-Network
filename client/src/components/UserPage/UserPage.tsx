@@ -212,6 +212,7 @@ const UserPage = () => {
                 <Modal
                   isOpen={isModalOpen}
                   setIsModalOpen={setIsModalOpen}
+                  type='default'
                 >
                   <ModalEditAvatar
                     user={user}
@@ -268,6 +269,7 @@ const UserPage = () => {
             <Modal
               isOpen={isModalFollowersOpen}
               setIsModalOpen={setIsModalFollowersOpen}
+              type='default'
             >
               <ModalFollowers followers={followers} following={following} setIsModalOpen={setIsModalFollowersOpen} openFollowers={openFollowers} setOpenFollowers={setOpenFollowers}/>
             </Modal>
@@ -286,7 +288,7 @@ const UserPage = () => {
     <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
   </>
 ) : ( // Здесь идет проверка на черный список
-  (settings && settings.privateProfile === true && followStatus === 3) || (settings && settings.privateProfile === false) ? (
+  (settings && settings.privateProfile === true && followStatus === 3) || (settings && settings.privateProfile === false) || (authUser && authUser?.id === Number(id)) ? (
     <>
       {posts.length > 0 ? (
         posts.map((post) => (

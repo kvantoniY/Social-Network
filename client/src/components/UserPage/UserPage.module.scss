@@ -2,21 +2,45 @@
     max-width: 1000px;
     margin: 10px auto;
     margin-top: 60px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
 }
+
+.userProfile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .userAboutContainer {
     position: relative;
     margin: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.username {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 10px 0;
 }
 
 .followContainer {
-    position: relative;
+    display: flex;
+    gap: 20px;
     margin-top: 20px;
 }
 
 .followContainer p {
     cursor: pointer;
     margin-top: 5px;
+    color: #0073e6;
+    font-weight: 600;
 }
+
 .followContainer p:hover {
     text-decoration: underline;
 }
@@ -25,34 +49,72 @@
     display: flex;
     align-items: center;
     margin-top: 10px;
+    gap: 5px;
 }
+
 .editAboutContainer img {
-    max-width: 15px;
-    max-height: 15px;
-    margin-left: 5px;
+    width: 15px;
+    height: 15px;
     cursor: pointer;
 }
+
 .editAboutContainer input {
     min-height: 31px;
-    margin-right: 5px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
+
 .editAboutContainer input:focus {
-    outline: none; 
+    outline: none;
+    border-color: #0073e6;
 }
 
 .subsContainer {
-    position: absolute;
-    bottom: 1px;
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
 }
 
 .userAvatarContainer img {
-    grid-area: avatar; /* Позиция аватара в сетке */
-    display: block; /* Убираем отступы по умолчанию */
-    width: 245px; /* Задайте ширину */
-    height: 245px; /* Задайте высоту */
-    border-radius: 50%; /* Сделает контейнер круглым */
-    object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
+    width: 245px;
+    height: 245px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
+
+.userAvatarContainer img:hover {
+    transform: scale(1.05);
+}
+
 .blackList {
     color: red;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.about {
+    font-size: 16px;
+    color: #555;
+    margin-top: 10px;
+    max-width: 400px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.userProfile button {
+    padding: 10px 20px;
+    margin-top: 15px;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.userProfile button:hover {
+    background-color: #005bb5;
 }

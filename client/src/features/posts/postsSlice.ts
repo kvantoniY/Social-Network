@@ -1,7 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI, createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI, fetchCommentsAPI, fetchLastCommentAPI, createLikeCommentAPI, deleteLikeCommentAPI, fetchPostAPI } from './postsAPI';
+import {
+  fetchPostsAPI, createPostAPI, fetchUserPostsAPI, deletePostAPI,
+  createLikeAPI, deleteLikeAPI, fetchLikesAPI, createCommentAPI, deleteCommentAPI,
+  fetchCommentsAPI, fetchLastCommentAPI, createLikeCommentAPI, deleteLikeCommentAPI, fetchPostAPI
+} from './postsAPI';
 
-import { Post, User, Comment, Like } from '../../types/types';
+import { Post } from '../../types/types';
 
 interface PostsState {
   posts: Post[];

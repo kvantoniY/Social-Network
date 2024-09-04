@@ -145,7 +145,6 @@ input {
 }
 
 .modalContent {
-  background: white;
   padding: 20px;
   border-radius: 8px;
   width: 80%;
@@ -177,26 +176,6 @@ input {
   z-index: 100;
 }
 
-.userProfile {
-  background-color: map-get($light-theme, post);
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid map-get($light-theme, post-border);
-  color: map-get($light-theme, text);
-  display: flex;
-  
-}
-
-.dialogUserContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 60px;
-  font-size: 18px;
-  background-color: map-get($light-theme, post);
-  border: 1px solid map-get($light-theme, post-border);
-  padding: 10px;
-}
 .inputContainer {
   display: flex;
   padding: 10px;
@@ -207,21 +186,82 @@ input {
   max-width: 1080px;
   box-sizing: border-box;
 }
-.dialogUserContainer {
+
+.userProfileContainer {
+  background-color: map-get($light-theme, post);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid map-get($light-theme, post-border);
+  color: map-get($light-theme, text);
+  display: flex;
+  
+}
+
+.userInDialogContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 60px;
+  font-size: 18px;
+  background-color: map-get($light-theme, post);
+  border: 1px solid map-get($light-theme, post-border);
+  padding: 10px;
+}
+
+.userInDialogContainer {
   display: flex;
   align-items: center;
   padding: 10px;
   background-color: map-get($light-theme, post);
 }
 
-.messageContainer {
+.dialogUserContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 60px;
+  object-fit: cover;
+  border-radius: 10px 10px 10px 0px;
+  background-color: map-get($light-theme, post);
+}
+
+.userMessageContainer {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 3px;
+  word-wrap: break-word; /* Заставляет текст переноситься на новую строку */
+  overflow-wrap: break-word; /* Альтернатива word-wrap для лучной поддержки браузерами */
+}
+
+.dialogContainer {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
   border: 1px solid map-get($light-theme, post-border);
   background-color: map-get($light-theme, post);
 }
+.userSettingsContainer {
 
+}
+
+.messageContainer {
+  flex-grow: 1; /* Заполняет оставшееся пространство */
+  padding: 10px;
+  overflow-y: auto; /* Сообщения будут прокручиваться */
+  background-color: #fafafa;
+}
+
+.userListContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: rgb(226, 226, 226);
+}
 
 body.dark {
   background-color: map-get($dark-theme, background);

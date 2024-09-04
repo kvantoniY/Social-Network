@@ -6,14 +6,14 @@ import { fetchUser } from '@/features/users/usersSlice';
 import io from 'socket.io-client';
 import styles from './Dialog.module.scss';
 import Link from 'next/link';
-import { deleteIconMini, deleteIcon } from '../../assets/';
+import { deleteIconMini, deleteIcon, addImageIcon, sendIcon } from '../../assets/';
 import { User } from '@/types/types';
 import axiosInstance from '@/utils/axiosInstance';
 import ImageSlider from '../ImageSlider/ImageSlider';
 import { Message as MessageType } from '../../types/types'
 import Modal from '../ui/MyModal/Modal';
 import PostModal from '../Modals/ModalPost/ModalPost';
-import { formatDate } from '@/utils/dataUtils';
+import { formatDate } from '@/utils/dateUtils';
 import Message from '../Message/Message';
 import { fetchCurrentUserSettings } from '@/features/settings/settingsSlice';
 import { searchCurrentFollower } from '@/features/follows/followSlice';
@@ -192,44 +192,47 @@ const Dialog: React.FC = () => {
       ) : (
         (settings && settings.canMessage === 'mutuals' && followStatus === 3) || (settings && settings.canMessage === "everyone") ? (
         <>
-          <form onSubmit={sendSocketMessage} className='createMessage'>
-            <div
-              contentEditable
-              ref={contentRef}
-              className='inputCreatePost'
-              onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
-              suppressContentEditableWarning={true}
-            />
-            {imagePreviews.length > 0 && (
-              <div className={styles.imagePreviewContainer}>
-                {imagePreviews.map((preview: any, index: any) => (
-                  <div key={index} className={styles.imagePreviewWrapper}>
-                    <img src={preview} alt="Preview" className={styles.imagePreview} />
-                    <img
-                      src={deleteIconMini.src}
-                      alt="Delete"
-                      className={styles.deleteImage}
-                      onClick={() => handleDeleteImage(index)}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-            <hr className={styles.separator} />
-            <div className={styles.actions}>
-              <label htmlFor="fileInput" className={styles.fileLabel}>
-                <input
-                  id="fileInput"
-                  type="file"
-                  onChange={selectFiles}
-                  multiple
-                  style={{ display: 'none' }}
-                  className={styles.fileInput}
-                />
-              </label>
-              <button type="submit" className={styles.submitButton}>Отправить</button>
-            </div>
-          </form>
+<form onSubmit={sendSocketMessage} className={styles.createMessage}>
+  <div className={styles.inputContainer}>
+    <label htmlFor="fileInput" className={styles.iconButton}>
+      <img src={addImageIcon.src} alt="Add image" />
+    </label>
+    <input
+      id="fileInput"
+      type="file"
+      onChange={selectFiles}
+      multiple
+      style={{ display: 'none' }} // Скрываем инпут, но он связан с label
+    />
+
+    <div
+      contentEditable
+      ref={contentRef}
+      className={styles.inputCreatePost}
+      onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
+      suppressContentEditableWarning={true}
+    />
+    
+    <button type="submit" className={styles.submitButton}>
+      <img src={sendIcon.src} alt="Send" />
+    </button>
+  </div>
+</form>
+{imagePreviews.length > 0 && (
+    <div className={styles.imagePreviewContainer}>
+      {imagePreviews.map((preview, index) => (
+        <div key={index} className={styles.imagePreviewWrapper}>
+          <img src={preview} alt="Preview" className={styles.imagePreview} />
+          <img
+            src={deleteIconMini.src}
+            alt="Delete"
+            className={styles.deleteImage}
+            onClick={() => handleDeleteImage(index)}
+          />
+        </div>
+      ))}
+    </div>
+  )}
         </>
       ) : (
         <>

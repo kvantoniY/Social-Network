@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store/store';
 import { fetchUserProfile, logout, changePassword } from '@/features/auth/authSlice';
 import { fetchUserSettings, updateUserSettings } from '@/features/settings/settingsSlice';
-import ThemeToggle from '../Header/ThemeToggle';
+import ThemeToggle from '../ThemeToogle/ThemeToggle';
 import styles from './Settings.module.scss';
 import { logoutIcon } from '../../assets/';
 

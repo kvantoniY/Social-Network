@@ -15,7 +15,11 @@ import editIcon from './edit.svg'
 import arrowLeftIcon from './arrowLeftIcon.png'
 import arrowRightIcon from './arrowRightIcon.png'
 import settingsIcon from './settingsIcon.png'
-
+import shareIcon from './shareIcon.png'
+import addImageIcon from './addImage.svg'
+import sendIcon from './sendIcon.png'
+import downloadIcon from './downloadIcon.png'
+import addNewImageIcon from './addNewImageIcon.png'
 export {
   deleteIcon,
   deleteIconMini,
@@ -33,5 +37,10 @@ export {
   editIcon,
   arrowLeftIcon,
   arrowRightIcon,
-  settingsIcon
+  settingsIcon,
+  shareIcon,
+  addImageIcon,
+  sendIcon,
+  downloadIcon,
+  addNewImageIcon
 };

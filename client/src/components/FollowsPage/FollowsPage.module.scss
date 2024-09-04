@@ -32,9 +32,6 @@
 .avatar {
     @include avatar;
 }
-.followContainer {
-    @include followContainer;
-}
 
 .searchResult {
     margin-top: 20px;

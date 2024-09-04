@@ -111,8 +111,8 @@ const socketHandler = (server) => {
           include: [
             { model: User, as: 'Sender' },
             { model: User, as: 'Receiver' },
-            { model: Post, as: 'Post'}
-          ]
+            { model: Post, as: "Post", include: [{ model: User }] },
+          ],
         });
   
         io.to(`dialog_${dialogId}`).emit('chat message', messageWithUsers);

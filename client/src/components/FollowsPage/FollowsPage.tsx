@@ -91,7 +91,7 @@ const FollowsPage = () => {
       {typeof searchResults === "object" && searchResults ? (
         <div className={styles.searchResult}>
           <Link href={`/users/${searchResults?.id}`}>
-            <div className={styles.followContainer}>
+            <div className='followContainer'>
               <img
                 src={`http://localhost:3001/${searchResults?.image || "default.jpg"}`}
                 alt=""
@@ -112,7 +112,7 @@ const FollowsPage = () => {
           <h2>Подписчики</h2>
           {followers.map((follower: any) => (
             <Link href={`/users/${follower?.id}`} key={follower?.id}>
-              <div className={styles.followContainer}>
+              <div className='followContainer'>
                 <img
                   src={`http://localhost:3001/${follower?.image || "default.jpg"}`}
                   alt=""

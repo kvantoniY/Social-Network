@@ -9,10 +9,10 @@ const CreatePost = () => {
   const [content, setContent] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const { status, error } = useSelector((state: RootState) => state.posts);
-  const [images, setImages] = useState<File[]>([]); // Храним массив мемов
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Храним превью мемов для отображения
-  const [sourceImages, setSourceImages] = useState<File[]>([]); // Храним массив исходных изображений
-  const [sourceImagePreviews, setSourceImagePreviews] = useState<string[]>([]); // Храним превью исходных изображений
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [sourceImages, setSourceImages] = useState<File[]>([]);
+  const [sourceImagePreviews, setSourceImagePreviews] = useState<string[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const selectFiles = (e: React.ChangeEvent<HTMLInputElement>, type: 'meme' | 'source') => {
@@ -43,10 +43,10 @@ const CreatePost = () => {
       const formData = new FormData();
       formData.append('content', content);
       images.forEach(image => {
-        formData.append('images', image); // Добавляем все мемы
+        formData.append('images', image);
       });
       sourceImages.forEach(sourceImage => {
-        formData.append('sourceImages', sourceImage); // Добавляем все исходные изображения
+        formData.append('sourceImages', sourceImage);
       });
       dispatch(createPost(formData));
       setContent('');
@@ -66,78 +66,82 @@ const CreatePost = () => {
       setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
     } else {
       setSourceImages((prevSourceImages) => prevSourceImages.filter((_, i) => i !== index));
-      setSourceImagePreviews((prevSourcePreviews) => prevSourcePreviews.filter((_, i) => i !== index));
+      setSourceImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className='createPost'>
-      <div
-        contentEditable
-        ref={contentRef}
-        className='inputCreatePost'
-        onInput={(e) => setContent(e.currentTarget.textContent || '')}
-        suppressContentEditableWarning={true}
-      />
-      {imagePreviews.length > 0 && (
-        <div>
-          <div className={styles.imagePreviewContainer}>
-            {imagePreviews.map((preview, index) => (
-              <div key={index} className={styles.imagePreviewWrapper}>
-                <img src={preview} alt="Preview" className={styles.imagePreview} />
-                <img
-                  src={deleteIconMini.src}
-                  alt="Delete"
-                  className={styles.deleteImage}
-                  onClick={() => handleDeleteImage(index, 'meme')}
-                />
-              </div>
-            ))}
-          </div>
+    <form onSubmit={handleSubmit} className={styles.createPostForm}>
+      <div className={styles.inputWrapper}>
+        <div
+          contentEditable
+          ref={contentRef}
+          className={styles.textInput}
+          onInput={(e) => setContent(e.currentTarget.textContent || '')}
+          suppressContentEditableWarning={true}
+        />
+        <div className={styles.buttons}>
+          <label htmlFor="fileInput" className={styles.fileButton}>
+            <input
+              id="fileInput"
+              type="file"
+              multiple
+              onChange={(e) => selectFiles(e, 'meme')}
+              style={{ display: 'none' }}
+            />
+          </label>
+          <label htmlFor="sourceFileInput" className={styles.fileButton}>
+            <input
+              id="sourceFileInput"
+              type="file"
+              multiple
+              onChange={(e) => selectFiles(e, 'source')}
+              style={{ display: 'none' }}
+            />
+          </label>
+          <button type="submit" className={styles.sendButton}>Отправить</button>
         </div>
-      )}
-      {sourceImagePreviews.length > 0 && (
-        <div>
-          <div className={styles.imagePreviewContainer}>
-            {sourceImagePreviews.map((preview, index) => (
-              <div key={index} className={styles.imagePreviewWrapper}>
-                <img src={preview} alt="Source Preview" className={styles.imagePreview} />
-                <img
-                  src={deleteIconMini.src}
-                  alt="Delete"
-                  className={styles.deleteImage}
-                  onClick={() => handleDeleteImage(index, 'source')}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      <hr className={styles.separator} />
-      <div className={styles.actions}>
-        <label htmlFor="fileInput" className={styles.fileLabel}>
-          <input
-            id="fileInput"
-            type="file"
-            multiple // Позволяем выбирать несколько файлов для мемов
-            onChange={(e) => selectFiles(e, 'meme')}
-            style={{ display: 'none' }}
-            className={styles.inputFile}
-          />
-        </label>
-        <label htmlFor="sourceFileInput" className={styles.fileLabel}>
-          <input
-            id="sourceFileInput"
-            type="file"
-            multiple // Позволяем выбирать несколько файлов для исходных изображений
-            onChange={(e) => selectFiles(e, 'source')}
-            style={{ display: 'none' }}
-            className={styles.inputFile}
-          />
-        </label>
-        <button type="submit" className={styles.buttonPost}>Опубликовать</button>
       </div>
-      {status === 'loading' && <p>Posting...</p>}
+
+      {imagePreviews.length > 0 && (
+  <div className={styles.memesContainer}>
+    <h4 className={styles.previewTitle}>Мемы</h4>
+    <div className={styles.previewImages}>
+      {imagePreviews.map((preview, index) => (
+        <div key={index} className={styles.previewWrapper}>
+          <img src={preview} alt="Preview" className={styles.previewImage} />
+          <img
+            src={deleteIconMini.src}
+            alt="Delete"
+            className={styles.deleteImage}
+            onClick={() => handleDeleteImage(index, 'meme')}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{sourceImagePreviews.length > 0 && (
+  <div className={styles.sourceImagesContainer}>
+    <h4 className={styles.previewTitle}>Исходные изображения</h4>
+    <div className={styles.previewImages}>
+      {sourceImagePreviews.map((preview, index) => (
+        <div key={index} className={styles.previewWrapper}>
+          <img src={preview} alt="Source Preview" className={styles.previewImage} />
+          <img
+            src={deleteIconMini.src}
+            alt="Delete"
+            className={styles.deleteImage}
+            onClick={() => handleDeleteImage(index, 'source')}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+      {status === 'loading' && <p>Отправка...</p>}
       {error && <p>{error}</p>}
     </form>
   );

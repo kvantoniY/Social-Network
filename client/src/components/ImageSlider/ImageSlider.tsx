@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './ImageSlider.module.scss';
-import ImageModal from '../ui/ImageModal/ImageModal';
+import Modal from '../ui/MyModal/Modal';
 
 interface SliderProps {
   images: string[];
@@ -46,11 +46,11 @@ const ImageSlider: React.FC<SliderProps> = ({ images }) => {
       <button className={styles.nextButton} onClick={nextSlide}>
         &#10095;
       </button>
-      <ImageModal isOpen={isOpen} setIsModalOpen={setIsModalOpen}>
+      <Modal isOpen={isOpen} setIsModalOpen={setIsModalOpen} type="image">
         <div>
           <img src={`http://localhost:3001/` + modalImage} alt="" className={styles.img_modal} />
         </div>
-      </ImageModal>
+      </Modal>
     </div>
   );
 };

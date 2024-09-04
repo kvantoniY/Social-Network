@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { switchThemeLight, switchThemeDark  } from '@/assets';
 
-import styles from './Header.module.scss'
+import styles from './ThemeToogle.module.scss'
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState('light');
