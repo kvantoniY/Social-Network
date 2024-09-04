@@ -20,6 +20,9 @@ import addImageIcon from './addImage.svg'
 import sendIcon from './sendIcon.png'
 import downloadIcon from './downloadIcon.png'
 import addNewImageIcon from './addNewImageIcon.png'
+import blackListIcon from './blackListIcon.png'
+import unBlackListIcon from './unBlackListIcon.png'
+
 export {
   deleteIcon,
   deleteIconMini,
@@ -42,5 +45,7 @@ export {
   addImageIcon,
   sendIcon,
   downloadIcon,
-  addNewImageIcon
+  addNewImageIcon,
+  blackListIcon,
+  unBlackListIcon
 };

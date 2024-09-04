@@ -11,11 +11,10 @@ import ModalEditAvatar from '@/components/Modals/ModalEditAvatar/ModalEditAvatar
 import Modal from '@/components/ui/MyModal/Modal';
 import ModalFollowers from '@/components/Modals/ModalFollowers/ModalFollowers';
 import styles from './UserPage.module.scss';
-import {editIcon} from '@/assets'
+import { addImageIcon, blackListIcon, editIcon, sendIcon, unBlackListIcon } from '@/assets';
 import Link from 'next/link';
 import io from 'socket.io-client';
 import axiosInstance from '@/utils/axiosInstance';
-import { Dialog } from '@/types/types';
 import { AddBlackListAPI, CheckBlackListAPI, DeleteBlackListAPI } from '@/features/users/usersAPI';
 import { fetchCurrentUserSettings } from '@/features/settings/settingsSlice';
 
@@ -38,6 +37,7 @@ const UserPage = () => {
   const [socket, setSocket] = useState<any>(null);
   const [blackListStatus, setBlackListStatus] = useState(false);
   const [isBlackListStatus, setIsBlackListStatus] = useState(false);
+
   const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImage(e.target.files[0]);
@@ -50,16 +50,15 @@ const UserPage = () => {
       const userId = Number(id)
       const checkBlackListStatus = async () => {
         try {
-          
-          const response = await axiosInstance.get(`/users/checkBlackList/${userId}`)
-          if(response.data.isBlackList) {
-            setIsBlackListStatus(true)
+          const response = await axiosInstance.get(`/users/checkBlackList/${userId}`);
+          if (response.data.isBlackList) {
+            setIsBlackListStatus(true);
           }
-          if(response.data.blUser) {
-            setBlackListStatus(true)
+          if (response.data.blUser) {
+            setBlackListStatus(true);
           }
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
       }
       dispatch(fetchUser(Number(id)));
@@ -67,20 +66,16 @@ const UserPage = () => {
       dispatch(searchFollowers(Number(id)));
       dispatch(searchFollowing(Number(id)));
       dispatch(searchCurrentFollower(Number(id)));
-      dispatch(fetchCurrentUserSettings(Number(id)))
+      dispatch(fetchCurrentUserSettings(Number(id)));
       const findDialogId = async () => {
         try {
-          const response = await axiosInstance.post('/messages/dialog', { id: numericId })
+          const response = await axiosInstance.post('/messages/dialog', { id: numericId });
           if (response.data) {
-            setDialogId(response.data.dialogId)
-          } else {
-
+            setDialogId(response.data.dialogId);
           }
-          console.log("resp data null")
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
-        console.log(dialogId)
       }
       checkBlackListStatus();
       findDialogId();
@@ -97,7 +92,7 @@ const UserPage = () => {
     if (authUser) {
       const newSocket = io(':3001');
       setSocket(newSocket);
-      newSocket.emit('join', authUser?.id); // Присоединение к комнате пользователя
+      newSocket.emit('join', authUser?.id);
 
       return () => {
         newSocket.close();
@@ -115,7 +110,6 @@ const UserPage = () => {
         type: "share",
         postId: postId
       };
-      console.log(messageData)
       socket.emit('chat message', messageData);
     }
   }
@@ -123,17 +117,17 @@ const UserPage = () => {
   const handleBlackList = async (status: string) => {
     if (status === "add") {
       try {
-        const response = await AddBlackListAPI(Number(id))
-        setIsBlackListStatus(true)
+        await AddBlackListAPI(Number(id));
+        setIsBlackListStatus(true);
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     } else {
       try {
-        const response = await DeleteBlackListAPI(Number(id))
-        setIsBlackListStatus(false)
+        await DeleteBlackListAPI(Number(id));
+        setIsBlackListStatus(false);
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     }
   }
@@ -142,12 +136,12 @@ const UserPage = () => {
     try {
       await dispatch(follow(Number(id)));
       if (settings && settings.followerNotifications) {
-      const notificationData = {
-        type: 'follow',
-        userId: Number(id),
-        actorId: Number(authUser?.id),
-      };
-      socket.emit('create_notification', notificationData); // Присоединение к комнате пользователя
+        const notificationData = {
+          type: 'follow',
+          userId: Number(id),
+          actorId: Number(authUser?.id),
+        };
+        socket.emit('create_notification', notificationData);
       }
     } catch (e) {
       console.log(e);
@@ -165,7 +159,6 @@ const UserPage = () => {
   const handleEditUser = async () => {
     try {
       await dispatch(editUser(about));
-      setAbout('');
       setIsEdit(false);
     } catch (e) {
       console.log(e);
@@ -178,136 +171,142 @@ const UserPage = () => {
       formData.append('image', image);
       await dispatch(editUserAvatar(formData));
       dispatch(fetchUser(Number(id)));
-      setAbout('');
     } catch (e) {
       console.log(e);
     }
   };
-  const [openFollowers, setOpenFollowers] = useState(true)
+
+  const [openFollowers, setOpenFollowers] = useState(true);
   
   const handleOpenFollowers = (checkOpenFollowers: string) => {
     checkOpenFollowers === 'followers' ? setOpenFollowers(true) : setOpenFollowers(false);
-    setIsModalFollowersOpen(true)
+    setIsModalFollowersOpen(true);
   }
 
   return (
     <div className={styles.userPage}>
-      <div className='userProfile'>
+      <div className={styles.userProfile}>
         {status === 'loading' && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {user && (
           <>
-           <div className={styles.userAvatarContainer}>
-            <img
-              src={`http://localhost:3001/` + user?.image || "default.jpg"}
-              alt=""
-              style={{ maxWidth: '360px', maxHeight: '240px' }}
-              onClick={() => setIsModalOpen(true)}
-            />
+            <div className={styles.userAvatarContainer}>
+              <img
+                src={`http://localhost:3001/` + user?.image || "default.jpg"}
+                alt=""
+                onClick={() => setIsModalOpen(true)}
+              />
             </div>
             <div className={styles.userAboutContainer}>
-            <h1 className={styles.username}>{user.username}</h1>
-            {authUser?.id === user.id ? (
-              <div>
-                <Modal
-                  isOpen={isModalOpen}
-                  setIsModalOpen={setIsModalOpen}
-                  type='default'
-                >
-                  <ModalEditAvatar
-                    user={user}
-                  />
-                </Modal>
-                {isEdit ? (
-                  <div className={styles.editAboutContainer}>
-                    <input type="text" value={about} onChange={(e) => setAbout(e.target.value)} />
-                    <button onClick={handleEditUser}>Готово</button>
-                  </div>
-                ) : (
-                  <div className={styles.editAboutContainer}>
-                    
-                    {authUser?.id === user.id && (
-                    <>
-                        <div>{user.about?.length < 1 || user.about === null ? <div>Добавить описание</div> : <></>}</div>
-                        <img src={editIcon.src} onClick={() => setIsEdit(true)}/>
-                    </>
-                    )}
-                    
-
-                  </div>
-                )}
-                
-              </div>
-            ) : (
-              <div className={styles.subsContainer}>
-                {blackListStatus === true || isBlackListStatus === true ? (
-                  <>
-                   
-                  </>
-                ) : (
-                  <>
-                  {followStatus === 0 && <button onClick={handleFollow}>Подписаться</button>}
-                {followStatus === 2 && <button onClick={handleFollow}>Подписаться в ответ</button>}
-                {followStatus === 3 && (
+              <h1 className={styles.username}>{user.username}</h1>
+              {authUser?.id === user.id ? (
+                isEdit ? (
                   <div>
-                    <button onClick={handleUnFollow}>Отписаться</button>
+                    <input
+                      type="text"
+                      value={about}
+                      onChange={(e) => setAbout(e.target.value)}
+                    />
+                    <button onClick={handleEditUser}>Сохранить</button>
+                    <button onClick={() => setIsEdit(false)}>Отмена</button>
                   </div>
-                )}
-                {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
-                  </>
-                )}
-                {settings?.canMessage === "everyone" && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
-                {settings?.canMessage === "mutuals" && followStatus === 3 && <Link href={`/dialogs/${user.id}`}>Написать</Link>}
-                {isBlackListStatus ? <div onClick={() => handleBlackList("delete")}>Убрать ЧС</div> : <div onClick={() => handleBlackList("add")}>Добавить в ЧС</div>}
-                
+                ) : (
+                  <div className={styles.aboutContainer}>
+                    <p>{user.about?.length > 0 ? user.about : 'Добавить описание'}</p>
+                    <img onClick={() => setIsEdit(true)} alt="edit" src={editIcon.src}/>
+                  </div>
+                )
+              ) : (
+                <p className={styles.aboutContainer}>{user.about}</p>
+              )}
+              {authUser?.id === user.id ? (
+                <div>
+                  <Modal
+                    isOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    type='default'
+                  >
+                    <ModalEditAvatar user={user} />
+                  </Modal>
               </div>
-            )}
-            <div className={styles.followContainer}>
+              ) : (
+                <div className={styles.subsContainer}>
+                  {blackListStatus === true ? (
+                    <>
+                      <div>Вы в черном списке этого пользователя</div>
+                    </>
+                  ) : isBlackListStatus === true ? (
+                    <>
+                    <div>Вы добавили пользователя в чёрный список</div>
+                    </>
+                  ) : (
+                    <>
+                      {followStatus === 0 && <button onClick={handleFollow}>Подписаться</button>}
+                      {followStatus === 2 && <button onClick={handleFollow}>Подписаться в ответ</button>}
+                      {followStatus === 3 && (
+                        <div>
+                          <button onClick={handleUnFollow}>Отписаться</button>
+                        </div>
+                      )}
+                      {followStatus === 1 && <button onClick={handleUnFollow}>Отписаться</button>}
+                    </>
+                  )}
+                  {settings?.canMessage === "everyone" && <Link href={`/dialogs/${user.id}`}><img src={sendIcon.src} alt='send message' className={styles.icon}/></Link>}
+                  {settings?.canMessage === "mutuals" && followStatus === 3 && <Link href={`/dialogs/${user.id}`}><img src={sendIcon.src} alt='send message' className={styles.icon}/></Link>}
+                  {isBlackListStatus ? (
+                    <div onClick={() => handleBlackList("delete")}><img src={unBlackListIcon.src} alt='send message' className={styles.icon}/></div>
+                  ) : (
+                    <div onClick={() => handleBlackList("add")}><img src={blackListIcon.src} alt='send message' className={styles.icon}/></div>
+                  )}
+                </div>
+              )}
+              <div className={styles.followContainer}>
                 <p onClick={() => handleOpenFollowers('followers')}>Подписчиков: {followers?.length}</p>
                 <p onClick={() => handleOpenFollowers('following')}>Подписок: {following?.length}</p>
+              </div>
+              <Modal
+                isOpen={isModalFollowersOpen}
+                setIsModalOpen={setIsModalFollowersOpen}
+                type='default'
+              >
+                <ModalFollowers
+                  followers={followers}
+                  following={following}
+                  setIsModalOpen={setIsModalFollowersOpen}
+                  openFollowers={openFollowers}
+                  setOpenFollowers={setOpenFollowers}
+                />
+              </Modal>
+              
             </div>
-            <Modal
-              isOpen={isModalFollowersOpen}
-              setIsModalOpen={setIsModalFollowersOpen}
-              type='default'
-            >
-              <ModalFollowers followers={followers} following={following} setIsModalOpen={setIsModalFollowersOpen} openFollowers={openFollowers} setOpenFollowers={setOpenFollowers}/>
-            </Modal>
-            <div className={styles.about}>{user.about}</div>
-            </div>
-           
           </>
-          
         )}
-        
       </div>
       <div>
         {user && authUser?.id === user.id && <CreatePost />}
         {blackListStatus ? (
-  <>
-    <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
-  </>
-) : ( // Здесь идет проверка на черный список
-  (settings && settings.privateProfile === true && followStatus === 3) || (settings && settings.privateProfile === false) || (authUser && authUser?.id === Number(id)) ? (
-    <>
-      {posts.length > 0 ? (
-        posts.map((post) => (
-          <Post key={post.id} post={post} socket={socket} sendMessage={sendMessage} />
-        ))
-      ) : (
-        <p>No posts available</p>
-      )}
-    </>
-  ) : (
-    <>
-      
-    </>
-  )
-)}
-
+          <p className={styles.blackList}>Пользователь добавил вас в чёрный список</p>
+        ) : (
+          (settings && settings.privateProfile === true && followStatus === 3) ||
+          (settings && settings.privateProfile === false) ||
+          (authUser && authUser?.id === Number(id)) ? (
+            <>
+              {posts.length > 0 ? (
+                posts.map((post) => (
+                  <Post key={post.id} post={post} socket={socket} sendMessage={sendMessage} />
+                ))
+              ) : (
+                <p>No posts available</p>
+              )}
+            </>
+          ) : (
+            <p>Этот профиль приватный</p>
+          )
+        )}
       </div>
     </div>
   );
 };
 
 export default UserPage;
+
