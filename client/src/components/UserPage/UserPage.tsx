@@ -224,7 +224,7 @@ const UserPage = () => {
                   <Modal
                     isOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
-                    type='default'
+                    type='image'
                   >
                     <ModalEditAvatar user={user} />
                   </Modal>

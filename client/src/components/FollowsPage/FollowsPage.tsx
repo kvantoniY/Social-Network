@@ -42,8 +42,6 @@ const FollowsPage = () => {
           const response = await axiosInstance.get(`/users/myBlackListUsers/`);
           setBlockedUsers(response.data.blockedUsers);
           setUsersWhoBlockedMe(response.data.usersWhoBlockedMe);
-          console.log(blockedUsers)
-          console.log(usersWhoBlockedMe)
         } catch (error) {
           console.log(error);
         }
@@ -71,7 +69,7 @@ const FollowsPage = () => {
 
   return (
     <div className={styles.followsPage}>
-      <h2>Подписчики и подписки</h2>
+      <h2 className={styles.pageTitle}>Подписчики и подписки</h2>
       <form onSubmit={handleSearch} className={styles.searchUserContainer}>
         <input
           type="text"
@@ -82,18 +80,38 @@ const FollowsPage = () => {
         <button type="submit">Поиск</button>
       </form>
       <div className={styles.switchContainer}>
-        <button onClick={() => setFollowsList('followers')} className={followsList === 'followers' ? styles.active : ''}>Подписчики</button>
-        <button onClick={() => setFollowsList('subs')} className={followsList === 'subs' ? styles.active : ''}>Подписки</button>
-        <button onClick={() => setFollowsList('otherBlackList')} className={followsList === 'otherBlackList' ? styles.active : ''}>Вы в чёрном списке</button>
-        <button onClick={() => setFollowsList('myBlackList')} className={followsList === 'myBlackList' ? styles.active : ''}>У вас в чёрном списке</button>
+        <button
+          onClick={() => setFollowsList('followers')}
+          className={followsList === 'followers' ? styles.active : ''}
+        >
+          Подписчики
+        </button>
+        <button
+          onClick={() => setFollowsList('subs')}
+          className={followsList === 'subs' ? styles.active : ''}
+        >
+          Подписки
+        </button>
+        <button
+          onClick={() => setFollowsList('otherBlackList')}
+          className={followsList === 'otherBlackList' ? styles.active : ''}
+        >
+          Вы в чёрном списке
+        </button>
+        <button
+          onClick={() => setFollowsList('myBlackList')}
+          className={followsList === 'myBlackList' ? styles.active : ''}
+        >
+          У вас в чёрном списке
+        </button>
       </div>
 
-      {typeof searchResults === "object" && searchResults ? (
+      {typeof searchResults === 'object' && searchResults ? (
         <div className={styles.searchResult}>
           <Link href={`/users/${searchResults?.id}`}>
-            <div className='followContainer'>
+            <div className={styles.followContainer}>
               <img
-                src={`http://localhost:3001/${searchResults?.image || "default.jpg"}`}
+                src={`http://localhost:3001/${searchResults?.image || 'default.jpg'}`}
                 alt=""
                 className={styles.avatar}
               />
@@ -103,7 +121,7 @@ const FollowsPage = () => {
         </div>
       ) : (
         <div className={styles.searchResult}>
-          <h3 className={styles.searchResult}>{searchResults}</h3>
+          <h3>{searchResults}</h3>
         </div>
       )}
 
@@ -112,9 +130,9 @@ const FollowsPage = () => {
           <h2>Подписчики</h2>
           {followers.map((follower: any) => (
             <Link href={`/users/${follower?.id}`} key={follower?.id}>
-              <div className='followContainer'>
+              <div className={styles.followContainer}>
                 <img
-                  src={`http://localhost:3001/${follower?.image || "default.jpg"}`}
+                  src={`http://localhost:3001/${follower?.image || 'default.jpg'}`}
                   alt=""
                   className={styles.avatar}
                 />
@@ -130,7 +148,7 @@ const FollowsPage = () => {
             <Link href={`/users/${follower.id}`} key={follower.id}>
               <div className={styles.followContainer}>
                 <img
-                  src={`http://localhost:3001/${follower?.image || "default.jpg"}`}
+                  src={`http://localhost:3001/${follower?.image || 'default.jpg'}`}
                   alt=""
                   className={styles.avatar}
                 />
@@ -141,12 +159,12 @@ const FollowsPage = () => {
         </>
       ) : followsList === 'otherBlackList' ? (
         <>
-          <p>Вы в чёрном списке:</p>
+          <h2>Вы в чёрном списке:</h2>
           {usersWhoBlockedMe.map((user: any) => (
             <Link href={`/users/${user?.id}`} key={user?.id}>
               <div className={styles.followContainer}>
                 <img
-                  src={`http://localhost:3001/${user?.image || "default.jpg"}`}
+                  src={`http://localhost:3001/${user?.image || 'default.jpg'}`}
                   alt=""
                   className={styles.avatar}
                 />
@@ -157,12 +175,12 @@ const FollowsPage = () => {
         </>
       ) : (
         <>
-          <p>У вас в чёрном списке:</p>
+          <h2>У вас в чёрном списке:</h2>
           {blockedUsers.map((user: any) => (
             <Link href={`/users/${user?.id}`} key={user?.id}>
               <div className={styles.followContainer}>
                 <img
-                  src={`http://localhost:3001/${user?.image || "default.jpg"}`}
+                  src={`http://localhost:3001/${user?.image || 'default.jpg'}`}
                   alt=""
                   className={styles.avatar}
                 />
@@ -172,7 +190,6 @@ const FollowsPage = () => {
           ))}
         </>
       )}
-      <div></div>
     </div>
   );
 };
