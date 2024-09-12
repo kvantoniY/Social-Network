@@ -171,7 +171,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
   };
 
   return (
-    <div className={styles.post}>
+    <div className='post'>
       <div>
         <div className={styles.userContainer}>
           <Link href={`/users/${post.User?.id}`}>
@@ -263,7 +263,7 @@ const Post: React.FC<PostProps> = ({ post, sendMessage, socket }) => {
               placeholder="Есть что сказать?"
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              className={styles.input}
+              className='inputSendComment'
             />
             <img src={sendIcon.src} alt="Send" className={styles.sendComment} onClick={() => handleAddComment(post.id, post.userId)} />
           </div>

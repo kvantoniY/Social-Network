@@ -172,7 +172,7 @@ const Dialog: React.FC = () => {
   };
 
   return (
-    <div className={styles.dialogContainer}>
+    <div className='dialogContainer'>
       <Link href={`/users/${dialogUser?.id}`}>
         <div className='dialogUserContainer'>
           <img src={`http://localhost:3001/${dialogUser?.image || 'default.jpg'}`} alt="Avatar" className={styles.dialogAvatar} />
@@ -192,8 +192,8 @@ const Dialog: React.FC = () => {
       ) : (
         (settings && settings.canMessage === 'mutuals' && followStatus === 3) || (settings && settings.canMessage === "everyone") ? (
         <>
-<form onSubmit={sendSocketMessage} className={styles.createMessage}>
-  <div className={styles.inputContainer}>
+<form onSubmit={sendSocketMessage} className='createMessage'>
+  <div className='inputContainer'>
     <label htmlFor="fileInput" className={styles.iconButton}>
       <img src={addImageIcon.src} alt="Add image" />
     </label>

@@ -9,3 +9,19 @@
     align-items: center;
     justify-content: space-between;
   }
+  .sendCommentContainer {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .sendComment {
+    margin-left: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    width: 25px;
+    height: 25px;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }

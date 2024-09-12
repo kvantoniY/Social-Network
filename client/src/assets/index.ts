@@ -22,6 +22,7 @@ import downloadIcon from './downloadIcon.png'
 import addNewImageIcon from './addNewImageIcon.png'
 import blackListIcon from './blackListIcon.png'
 import unBlackListIcon from './unBlackListIcon.png'
+import addSourceImage from './addSourceImage.svg'
 
 export {
   deleteIcon,
@@ -47,5 +48,6 @@ export {
   downloadIcon,
   addNewImageIcon,
   blackListIcon,
-  unBlackListIcon
+  unBlackListIcon,
+  addSourceImage
 };

@@ -11,17 +11,6 @@
     z-index: 100;
   }
   
-  .modalContent {
-    position: relative;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 800px;
-    height: 100vh; /* Высота на весь экран */
-    overflow-y: auto; /* Вертикальная прокрутка */
-  }
-  
   .closeButton {
     position: absolute;
     top: 10px;
@@ -41,4 +30,6 @@
     background: white;
     color: red;
   }
-  
+  .postModal {
+    background: none;
+  }

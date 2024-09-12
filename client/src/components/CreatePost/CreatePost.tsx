@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createPost } from '../../features/posts/postsSlice';
 import { RootState, AppDispatch } from '../../store/store';
 import styles from "./CreatePost.module.scss";
-import { deleteIconMini } from '../../assets/';
+import { addSourceImage, deleteIconMini, sendIcon } from '../../assets/';
 
 const CreatePost = () => {
   const [content, setContent] = useState('');
@@ -26,13 +26,13 @@ const CreatePost = () => {
       }
 
       const selectedPreviews = selectedFiles.map(file => URL.createObjectURL(file));
-      
+
       if (type === 'meme') {
         setImages((prevImages) => [...prevImages, ...selectedFiles]);
         setImagePreviews((prevPreviews) => [...prevPreviews, ...selectedPreviews]);
       } else {
         setSourceImages((prevSourceImages) => [...prevSourceImages, ...selectedFiles]);
-        setSourceImagePreviews((prevSourcePreviews) => [...prevSourcePreviews, ...selectedPreviews]);
+        setSourceImagePreviews((prevPreviews) => [...prevPreviews, ...selectedPreviews]);
       }
     }
   };
@@ -70,9 +70,16 @@ const CreatePost = () => {
     }
   };
 
+  const triggerSourceFileInput = () => {
+    const input = document.getElementById('hiddenSourceFileInput') as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles.createPostForm}>
-      <div className={styles.inputWrapper}>
+      <div className='inputWrapper'>
         <div
           contentEditable
           ref={contentRef}
@@ -90,56 +97,57 @@ const CreatePost = () => {
               style={{ display: 'none' }}
             />
           </label>
-          <label htmlFor="sourceFileInput" className={styles.fileButton}>
-            <input
-              id="sourceFileInput"
-              type="file"
-              multiple
-              onChange={(e) => selectFiles(e, 'source')}
-              style={{ display: 'none' }}
-            />
-          </label>
           <button type="submit" className={styles.sendButton}>Отправить</button>
         </div>
       </div>
 
       {imagePreviews.length > 0 && (
-  <div className={styles.memesContainer}>
-    <h4 className={styles.previewTitle}>Мемы</h4>
-    <div className={styles.previewImages}>
-      {imagePreviews.map((preview, index) => (
-        <div key={index} className={styles.previewWrapper}>
-          <img src={preview} alt="Preview" className={styles.previewImage} />
-          <img
-            src={deleteIconMini.src}
-            alt="Delete"
-            className={styles.deleteImage}
-            onClick={() => handleDeleteImage(index, 'meme')}
-          />
+        <div className={styles.memesContainer}>
+          <h4 className={styles.previewTitle}>Мемы</h4>
+          <div className={styles.previewImages}>
+            {imagePreviews.map((preview, index) => (
+              <div key={index} className={styles.previewWrapper}>
+                <img src={preview} alt="Preview" className={styles.previewImage} />
+                <img
+                  src={deleteIconMini.src}
+                  alt="Delete"
+                  className={styles.deleteImage}
+                  onClick={() => handleDeleteImage(index, 'meme')}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
+      )}
 
-{sourceImagePreviews.length > 0 && (
-  <div className={styles.sourceImagesContainer}>
-    <h4 className={styles.previewTitle}>Исходные изображения</h4>
-    <div className={styles.previewImages}>
-      {sourceImagePreviews.map((preview, index) => (
-        <div key={index} className={styles.previewWrapper}>
-          <img src={preview} alt="Source Preview" className={styles.previewImage} />
-          <img
-            src={deleteIconMini.src}
-            alt="Delete"
-            className={styles.deleteImage}
-            onClick={() => handleDeleteImage(index, 'source')}
-          />
+      {imagePreviews.length > 0 && (
+        <div className={styles.sourceImagesContainer}>
+          <h4 className={styles.previewTitle}>Добавить исходные изображения мемов</h4>
+          <div className={styles.previewImages}>
+            {sourceImagePreviews.map((preview, index) => (
+              <div key={index} className={styles.previewWrapper}>
+                <img src={preview} alt="Source Preview" className={styles.previewImage} />
+                <img
+                  src={deleteIconMini.src}
+                  alt="Delete"
+                  className={styles.deleteImage}
+                  onClick={() => handleDeleteImage(index, 'source')}
+                />
+              </div>
+            ))}
+            <div className={styles.previewWrapper} onClick={triggerSourceFileInput}>
+              <img src={addSourceImage.src} alt="Source Preview" className={styles.previewImageAdd} />
+            </div>
+            <input
+              id="hiddenSourceFileInput"
+              type="file"
+              multiple
+              onChange={(e) => selectFiles(e, 'source')}
+              style={{ display: 'none' }}
+            />
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
+      )}
 
       {status === 'loading' && <p>Отправка...</p>}
       {error && <p>{error}</p>}

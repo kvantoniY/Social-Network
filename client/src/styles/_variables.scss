@@ -1,17 +1,17 @@
 // styles/_variables.scss
 
-
 $light-theme: (
   background: #f5f5f5,
-  text: black,
+  text: #333333,
   button-bg: #0070f3,
   button-text: #ffffff,
-  post: #e7e7e7,
-  post-border: rgba(165, 165, 165, 0.3),
-  comment: #d3d3d3,
-  comment-text: black,
+  post: #ffffff,
+  post-border: #e0e0e0,
+  message: #ffffff,
+  comment: #f0f0f0,
+  comment-text: #333333,
   header: #ffffff,
-  header-text: black
+  header-text: #333333
 );
 
 $dark-theme: (
@@ -19,10 +19,13 @@ $dark-theme: (
   text: #ffffff,
   button-bg: #0070f3,
   button-text: #ffffff,
-  post: #4D4D4D,
+  post: #2b2b2b,
   post-border: rgba(165, 165, 165, 0.3),
-  comment: #706e6e,
-  comment-text: white,
-  header: #4D4D4D,
+  comment: #353535,
+  message: #454545,
+  message-border: rgba(165, 165, 165, 0.3),
+  messageShare: #5e5d5d,
+  comment-text: #ffffff,
+  header: #474747,
   header-text: #ffffff
 );

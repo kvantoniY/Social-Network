@@ -126,10 +126,10 @@ const Header: React.FC = () => {
                 {notificationsRead > 0 && <span className={styles.badge}>{notificationsRead}</span>}
 
                 {showNotifications && (
-                  <div className={styles.notifications}>
+                  <div className='notifications'>
                     {notifications.length > 0 ? (
                       notifications.map((notification) => (
-                        <div key={notification.id} className={styles.notification}>
+                        <div key={notification.id} className='notification'>
                           {notification.type === 'like' && (
                             <>
                               Пользователь <Link href={`/users/${notification.Actor.id}`}>{notification.Actor.username}</Link> поставил лайк на ваш пост{' '}

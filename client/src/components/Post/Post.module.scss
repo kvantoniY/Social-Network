@@ -1,13 +1,5 @@
 @import '../../styles/mixins';
 
-.post {
-  border: 1px solid #e0e0e0;
-  padding: 15px;
-  border-radius: 10px;
-  background-color: white;
-  margin-bottom: 10px;
-  position: relative;
-}
 
 .userContainer {
   display: flex;
@@ -98,14 +90,6 @@
   margin-top: 20px;
   display: flex;
   align-items: center;
-}
-
-.input {
-  padding: 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  width: 100%;
-  outline: none;
 }
 
 .sendComment {

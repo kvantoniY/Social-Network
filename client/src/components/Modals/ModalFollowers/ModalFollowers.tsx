@@ -24,10 +24,10 @@ const ModalFollowers: React.FC<ModalFollowersProps> = ({ followers, following, s
             <button onClick={() => setOpenFollowers(false)} className={!openFollowers ? styles.active : ''}>Подписки</button>
             {openFollowers ? (
             <div>
-           
+            <h2>Подписчики</h2>
             {followers.map(follower => (
                 <Link href={`/users/${follower.id}`} onClick={() => setIsModalOpen(false)}>
-                <div className={styles.followContainer}>
+                <div className='followContainer'>
                 <img
                 src={`http://localhost:3001/` + follower?.image || "default.jpg"}
                 alt=""
@@ -40,9 +40,11 @@ const ModalFollowers: React.FC<ModalFollowersProps> = ({ followers, following, s
         </div>
             ) : (
                 <div>
+                    <h2>Подписки</h2>
                 {following.map(follower => (
                     <Link href={`/users/${follower.id}`} onClick={() => setIsModalOpen(false)}>
-                    <div className={styles.followContainer}>
+                        
+                    <div className='followContainer'>
                         <img
                             src={`http://localhost:3001/` + follower?.image || "default.jpg"}
                             alt=""

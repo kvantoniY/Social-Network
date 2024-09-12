@@ -68,7 +68,7 @@ const FollowsPage = () => {
   };
 
   return (
-    <div className={styles.followsPage}>
+    <div className='followsPage'>
       <h2 className={styles.pageTitle}>Подписчики и подписки</h2>
       <form onSubmit={handleSearch} className={styles.searchUserContainer}>
         <input

@@ -1,15 +1,4 @@
-.comment {
-  position: relative; /* Для абсолютного позиционирования кнопки удаления */
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between; /* Сразу размещаем контент и действия на разных концах */
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  
-}
+
 
 .userContainer {
   display: flex;

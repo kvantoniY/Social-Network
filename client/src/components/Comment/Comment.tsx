@@ -28,7 +28,7 @@ const Comment: React.FC<CommentProps> = ({ comment, authUser, post, handleDelete
   const formattedDate = formatDate(comment.createdAt);
 
   return (
-    <div className={styles.comment}>
+    <div className='comment'>
       <Link href={`/users/${comment.User?.id}`} onClick={() => setIsModalLikesOpen(false)}>
         <div className={styles.userContainer}>
           <img

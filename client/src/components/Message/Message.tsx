@@ -34,7 +34,7 @@ const Message: React.FC<any> = ({ message, authUser, handleDeleteMessage, socket
         <div>
             {message.type === 'message' ? (
                 <div key={message.id} className={`userMessageContainer`}>
-                    <div className={`${styles.userDetails} ${message.read === false ? styles.unread : ''}`}>
+                    <div className={`userDetails ${message.read === false ? styles.unread : ''}`}>
                         <Link href={`/users/${message.Sender?.id}`}>
                             <img
                                 src={`http://localhost:3001/${message.Sender?.image || 'default.jpg'}`}
@@ -71,7 +71,7 @@ const Message: React.FC<any> = ({ message, authUser, handleDeleteMessage, socket
                 </div>
             ) : (
                 <div key={message.id} className={`userMessageContainer`}>
-                    <div className={`${styles.userDetails} ${message.read === false ? styles.unread : ''}`}>
+                    <div className={`userDetails ${message.read === false ? styles.unread : ''}`}>
 
                         <Link href={`/users/${message.Sender?.id}`}>
                             <img
@@ -97,7 +97,7 @@ const Message: React.FC<any> = ({ message, authUser, handleDeleteMessage, socket
                                 <p className={styles.date}>{formatDate(message.createdAt)}</p>
                             </div>
                             <p className={styles.message}>{message.content}</p>
-                            <div className={styles.messageContentShare}>
+                            <div className='messageContentShare'>
                                 <div className={styles.userContainer}>
                                     <Link href={`/users/${message?.Post?.User?.id}`}>
                                         <img
@@ -120,7 +120,7 @@ const Message: React.FC<any> = ({ message, authUser, handleDeleteMessage, socket
                             </div>
                         </div>
 
-                        <Modal isOpen={isModalOpen} setIsModalOpen={setIsModalOpen} type="default">
+                        <Modal isOpen={isModalOpen} setIsModalOpen={setIsModalOpen} type="post">
                             <PostModal socket={socket} post={post} authUser={authUser} />
                         </Modal>
                     </div>

@@ -24,7 +24,8 @@ body {
   background-color: map-get($light-theme, background);
   color: map-get($light-theme, text);
   transition: background-color 0.3s, color 0.3s;
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 500;
 }
 
 
@@ -93,42 +94,25 @@ input {
 }
 .createMessage {
   display: flex;
-  flex-direction: column;
-  max-width: 980px;
-  margin: 0 auto;
-  width: 100%;
+  align-items: center;
   padding: 10px;
-  border-radius: 0px 0px 5px 5px;
-  border: 1px solid map-get($light-theme, post-border);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  background-color: map-get($light-theme, post);
+  border-top: 1px solid #ccc;
+  margin-bottom: 5px;
+  border-radius: 0px 0px 10px 10px;
+  background-color: #cfcfcf;
+  position: relative;
 }
 
 .post {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: white;
+  margin-bottom: 10px;
   position: relative;
-    background-color: map-get($light-theme, post);
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid map-get($light-theme, post-border);
-    color: map-get($light-theme, text);
-    position: relative;
-    margin-top: 10px;
 }
 .post p {
   color: black;
-}
-
-.comment {
-    background-color: map-get($light-theme, comment);
-    border-radius: 10px;
-    border: 1px solid map-get($light-theme, post-border);
-    padding: 20px;
-    color: map-get($light-theme, comment-text);
-    position: relative;
-    margin: 10px;
-}
-.comment p {
-  color: map-get($light-theme, comment-text);
 }
 
 .modalOverlay {
@@ -176,15 +160,15 @@ input {
   z-index: 100;
 }
 
-.inputContainer {
+
+.userProfile {
   display: flex;
-  padding: 10px;
-  background-color: map-get($light-theme, post);
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  max-width: 1080px;
-  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
 }
 
 .userProfileContainer {
@@ -194,7 +178,6 @@ input {
   border: 1px solid map-get($light-theme, post-border);
   color: map-get($light-theme, text);
   display: flex;
-  
 }
 
 .userInDialogContainer {
@@ -222,10 +205,19 @@ input {
   padding: 10px;
   margin-top: 60px;
   object-fit: cover;
-  border-radius: 10px 10px 10px 0px;
+  border-radius: 10px 10px 0px 0px;
   background-color: map-get($light-theme, post);
 }
 
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  padding: 5px;
+  border-radius: 10px;
+}
 .userMessageContainer {
   display: flex;
   position: relative;
@@ -236,22 +228,24 @@ input {
   overflow-wrap: break-word; /* Альтернатива word-wrap для лучной поддержки браузерами */
 }
 
-.dialogContainer {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid map-get($light-theme, post-border);
-  background-color: map-get($light-theme, post);
-}
-.userSettingsContainer {
-
-}
-
 .messageContainer {
-  flex-grow: 1; /* Заполняет оставшееся пространство */
+  flex-grow: 1; /* Позволяем контейнеру расти */
   padding: 10px;
-  overflow-y: auto; /* Сообщения будут прокручиваться */
-  background-color: #fafafa;
+  overflow-y: auto; /* Прокрутка для контейнера с сообщениями */
+  background-color: #fafafa; 
+}
+
+.messageContent {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 89%;
+  background-color: #f0f0f0;
+  margin-bottom: 10px;
 }
 
 .userListContainer {
@@ -263,6 +257,240 @@ input {
   background-color: rgb(226, 226, 226);
 }
 
+.inputSendComment {
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  border-radius: 10px;
+  width: 100%;
+  outline: none;
+}
+.comment {
+  position: relative; /* Для абсолютного позиционирования кнопки удаления */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Сразу размещаем контент и действия на разных концах */
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+}
+.followsPage {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: map-get($light-theme, text);
+}
+.followsPage p {
+  color: map-get($light-theme, text);
+}
+.dialogContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Высота на весь экран */
+  margin: 0 auto;
+  max-width: 1000px;
+  position: relative;
+  background-color: #f5f5f5; /* Новый фон */
+}
+.followContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: rgb(226, 226, 226);
+}
+
+.userDetails {
+  display: flex;
+  align-items: flex-start;
+  padding: 5px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+  position: relative; /* Добавлено для правильного позиционирования кнопки удаления */
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  border-radius: 25px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.messageContentShare {
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #fafafa;
+  margin-top: 15px;
+}
+
+.notifications {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 20px;
+
+  .notification {
+    padding: 10px;
+    border-bottom: 1px solid #cfcece;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.settingContainer {
+  background-color: #e7e7e7;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.modalContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.defaultModal {
+  background: white;
+  color: red;
+}
+
+body.dark a {
+  text-decoration: none;
+  color: map-get($dark-theme, text);
+}
+
+body.dark   .defaultModal {
+  background-color: map-get($dark-theme, post);
+  color: red;
+}
+
+body.dark .modalContainer {
+  background-color: map-get($dark-theme, post);
+}
+
+body.dark .settingContainer {
+  background-color: map-get($dark-theme, post);
+}
+
+body.dark .notifications {
+
+  background-color: map-get($dark-theme, post);
+
+}
+
+body.dark .inputContainer {
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+}
+
+body.dark .messageContainer {
+  flex-grow: 1; /* Позволяем контейнеру расти */
+  padding: 10px;
+  overflow-y: auto; /* Прокрутка для контейнера с сообщениями */
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+}
+
+body.dark .userDetails {
+  display: flex;
+  align-items: flex-start;
+  padding: 5px;
+  background-color: map-get($dark-theme, message);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  position: relative; /* Добавлено для правильного позиционирования кнопки удаления */
+}
+
+body.dark .messageContent {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 89%;
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+  margin-bottom: 10px;
+}
+
+body.dark .messageContentShare {
+  border: 1px solid map-get($dark-theme, message-border);
+  background-color: map-get($dark-theme, messageShare);
+}
+
+body.dark .dialogUserContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 60px;
+  object-fit: cover;
+  border-radius: 10px 10px 0px 0px;
+  background-color: map-get($dark-theme, post);
+  color: map-get($dark-theme, text);
+}
+
+body.dark .createMessage {
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+}
+
+body.dark .followsPage {
+  background-color: map-get($dark-theme, background);
+  border: 1px solid map-get($dark-theme, post-border);
+}
+body.dark .followsPage input{
+  background-color: map-get($dark-theme, background);
+  border: 1px solid map-get($dark-theme, post-border);
+  color: map-get($dark-theme, text);
+}
+body.dark .followsPage p{
+  color: map-get($dark-theme, text);
+}
+body.dark .followsPage h2{
+  color: map-get($dark-theme, text);
+}
+body.dark .followContainer {
+  background-color: map-get($dark-theme, post);
+  border: 1px solid map-get($dark-theme, post-border);
+}
+
+body.dark .dialogContainer {
+  background-color: map-get($dark-theme, background);
+}
+
 body.dark {
   background-color: map-get($dark-theme, background);
   color: map-get($dark-theme, text);
@@ -270,16 +498,17 @@ body.dark {
 
 body.dark .post {
     background-color: map-get($dark-theme, post);
-    color: white;
+    border: 1px solid map-get($dark-theme, post-border);
+    color: map-get($dark-theme, text);
 }
 body.dark .post p {
-  color: white;
+  color: map-get($dark-theme, text);
 }
 body.dark .comment {
   background-color: map-get($dark-theme, comment);
 }
 body.dark .modalContent {
-  background-color: map-get($dark-theme, background);
+
   color: white;
 }
 body.dark .header {
@@ -294,13 +523,35 @@ body.dark .createPost {
   color: map-get($light-theme, text);
 }
 
-
 body.dark .userProfile {
   background-color: map-get($dark-theme, post);
+  border: 1px solid map-get($dark-theme, post-border);
   color: map-get($dark-theme, text);
 }
 
 body.dark .userProfile h1{
+  color: map-get($dark-theme, text);
+}
+
+body.dark .inputWrapper {
+  background-color: map-get($dark-theme, post);
+  color: map-get($dark-theme, text);
+  border: 1px solid map-get($dark-theme, post-border);
+}
+
+body.dark .inputSendComment {
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+  color: map-get($dark-theme, text);
+}
+body.dark .comment {
+  border: 1px solid map-get($dark-theme, post-border);
+  background-color: map-get($dark-theme, post);
+}
+body.dark h2 {
+  color: map-get($dark-theme, text);
+}
+body.dark h1 {
   color: map-get($dark-theme, text);
 }
 

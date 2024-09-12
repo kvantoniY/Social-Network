@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import styles from './ModalShare.module.scss'
 import { Dialog as DialogType } from '@/types/types'
 import axiosInstance from '@/utils/axiosInstance';
+import { sendIcon } from '@/assets';
 
 interface ModalShareProps {
     sendMessage: (userId: number, postId: number, newMessage: string, e: React.FormEvent) => void;
@@ -54,19 +55,16 @@ const ModalShare: React.FC<ModalShareProps> = ({sendMessage, postId, setIsModalO
               </option>
             ))}
         </select>
-        <form onSubmit={(e) => handleSend(e)} className='createPost'>
-      <div
-        contentEditable
-        ref={contentRef}
-        className='inputCreatePost'
-        onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
-        suppressContentEditableWarning={true}
-      />
-      
-      <hr className={styles.separator} />
-      <div className={styles.actions}>
-        <button type="submit" className={styles.buttonPost}>Отправить</button>
-      </div>
+        <form onSubmit={(e) => handleSend(e)} className={styles.sendCommentContainer}>
+      <div className={styles.sendCommentContainer}>
+            <input
+              placeholder="Есть что сказать?"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              className='inputSendComment'
+            />
+            <img src={sendIcon.src} alt="Send" className={styles.sendComment} onClick={(e) => handleSend(e)} />
+          </div>
     </form>
     </div>
   )

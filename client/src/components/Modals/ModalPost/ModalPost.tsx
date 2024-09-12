@@ -150,9 +150,9 @@ const PostModal: React.FC<PostProps> = ({ post, socket, authUser }) => {
   };
 
   return (
-    <div className='post'>
+    <div>
       {post ? (
- <div className={styles.post}>
+ <div className='post'>
  <Link href={`/users/${post.User?.id}`}>
    <div className={styles.userContainer}>
      <img
@@ -231,7 +231,7 @@ const PostModal: React.FC<PostProps> = ({ post, socket, authUser }) => {
           {(post.User?.UserSetting?.canComment === 'everyone' ||
             (post.User?.UserSetting?.canComment === 'mutuals' && followStatus === 3) || (authUser?.id === post.User.id)) && (
               <div className={styles.sendCommentContainer}>
-                <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className={styles.input} />
+                <input placeholder='Есть что сказать?' value={commentText} onChange={(e) => setCommentText(e.target.value)} className='inputSendComment' />
                 <button onClick={() => handleAddComment(post.id, post.userId)} className={styles.sendComment}>Отправить</button>
               </div>
             )}

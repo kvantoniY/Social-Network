@@ -113,7 +113,7 @@ const Settings: React.FC = () => {
 
     return (
         <div className={styles.settingsPage}>
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <h1>Настройки</h1>
                 {authUser?.username}
                 <img
@@ -123,14 +123,14 @@ const Settings: React.FC = () => {
                 />
             </div>
 
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <div className={styles.optionContainer}>
                     <span>Изменить тему</span>
                     <ThemeToggle />
                 </div>
             </div>
 
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <h2>Закрытый профиль</h2>
                 <div className={styles.optionContainer}>
                     <p>Кто может просматривать мой профиль</p>
@@ -161,7 +161,7 @@ const Settings: React.FC = () => {
                 {updateStatus === 'error' && <p>{updateError}</p>}
             </div>
 
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <h2>Безопасность</h2>
                 <p onClick={() => setShowPasswordForm(!showPasswordForm)}>Изменить пароль</p>
 
@@ -198,7 +198,7 @@ const Settings: React.FC = () => {
             </div>
 
 
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <h2>Уведомления</h2>
                 <div className={styles.optionContainer}>
                     <p>Звук уведомлений</p>
@@ -257,11 +257,9 @@ const Settings: React.FC = () => {
                 </div>
             </div>
 
-            <div className={styles.settingContainer}>
+            <div className='settingContainer'>
                 <h2>Завершить сеанс</h2>
-                <button onClick={handleLogout} className={styles.logoutButton}>
-                    <img src={logoutIcon.src} alt="Выйти" className={styles.logout}/>
-                </button>
+                    <img src={logoutIcon.src} alt="Выйти" className={styles.logout} onClick={handleLogout}/>
             </div>
         </div>
     );

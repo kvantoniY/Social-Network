@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { RootState, AppDispatch } from '../store/store';
 import { fetchUserProfile, login, register } from '../features/auth/authSlice';
+import styles from '../styles/AuthPage.module.scss'; // Подключаем стили
 
 const AuthPage = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -22,7 +23,7 @@ const AuthPage = () => {
   const { user, status, error } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchUserProfile())
+    dispatch(fetchUserProfile());
     if (user) {
       router.push('/feed');
     }
@@ -30,23 +31,15 @@ const AuthPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isRegistering === true) {
-      try {
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('email', email);
-        formData.append('password', password);
-        if (image) {
-          formData.append('image', image);
-        }
-
-        await dispatch(register(formData));
-        setIsRegistering(false);
-      } catch (e) {
-        console.log(e)
-      }
+    const formData = new FormData();
+    if (isRegistering) {
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('password', password);
+      if (image) formData.append('image', image);
+      await dispatch(register(formData));
+      setIsRegistering(false);
     } else {
-      const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
       await dispatch(login(formData));
@@ -54,41 +47,45 @@ const AuthPage = () => {
   };
 
   return (
-    <div>
+    <div className={styles.authContainer}>
       <br /><br /><br /><br />
       <h2>{isRegistering ? 'Регистрация' : 'Вход'}</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.authForm}>
         {isRegistering && (
-          <div>
-          <input
-            type="text"
-            placeholder="Имя пользователя"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <input type="file" onChange={selectFile}/>
+          <div className={styles.formGroup}>
+            <input
+              type="text"
+              placeholder="Имя пользователя"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <input type="file" onChange={selectFile} />
           </div>
         )}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">{isRegistering ? 'Зарегистрироваться' : 'Войти'}</button>
+        <div className={styles.formGroup}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className={styles.submitButton}>
+          {isRegistering ? 'Зарегистрироваться' : 'Войти'}
+        </button>
       </form>
       {status === 'loading' && <p>Загрузка...</p>}
-      {error && <p>{error}</p>}
-      <button onClick={() => setIsRegistering(!isRegistering)}>
+      {error && <p className={styles.error}>{error}</p>}
+      <button onClick={() => setIsRegistering(!isRegistering)} className={styles.switchButton}>
         {isRegistering ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
       </button>
     </div>

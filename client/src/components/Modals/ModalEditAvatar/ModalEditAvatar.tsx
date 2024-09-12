@@ -44,7 +44,7 @@ const ModalEditAvatar: React.FC<ModalEditAvatarProps> = ({ user }) => {
   };
 
   return (
-    <div className={styles.modalContainer}>
+    <div className='modalContainer'>
       <div className={styles.avatarPreview} onClick={handleAvatarClick}>
         {image !== null ? (
           <img src={selectImage} alt="Selected" />

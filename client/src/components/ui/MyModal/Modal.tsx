@@ -33,7 +33,7 @@ console.log(type)
 
   return (
     <div className={styles.modalOverlay} onClick={handleOverlayClick}>
-      <div className={`modalContent ${type === 'default' ? styles.defaultModal : ''}`}>
+      <div className={`modalContent ${type === 'default' ? 'defaultModal' : type === 'post' ? styles.postModal : ''}`}>
         <img src={closeModal.src} className='closeButton' onClick={onClose} />
         {children}
       </div>

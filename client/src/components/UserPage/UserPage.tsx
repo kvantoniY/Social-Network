@@ -37,6 +37,7 @@ const UserPage = () => {
   const [socket, setSocket] = useState<any>(null);
   const [blackListStatus, setBlackListStatus] = useState(false);
   const [isBlackListStatus, setIsBlackListStatus] = useState(false);
+  const [isModalAvatarImageOpen, setIsModalAvatarImageOpen] = useState(false)
 
   const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -185,17 +186,26 @@ const UserPage = () => {
 
   return (
     <div className={styles.userPage}>
-      <div className={styles.userProfile}>
+      <div className='userProfile'>
         {status === 'loading' && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {user && (
           <>
             <div className={styles.userAvatarContainer}>
-              <img
-                src={`http://localhost:3001/` + user?.image || "default.jpg"}
-                alt=""
-                onClick={() => setIsModalOpen(true)}
-              />
+              {authUser?.id === user.id ? (
+                <img
+                  src={`http://localhost:3001/` + user?.image || "default.jpg"}
+                  alt=""
+                  onClick={() => setIsModalOpen(true)}
+                />
+              ) : (
+                <img
+                  src={`http://localhost:3001/` + user?.image || "default.jpg"}
+                  alt=""
+                  onClick={() => setIsModalAvatarImageOpen(true)}
+                />
+              )
+              }
             </div>
             <div className={styles.userAboutContainer}>
               <h1 className={styles.username}>{user.username}</h1>
@@ -277,11 +287,20 @@ const UserPage = () => {
                   setOpenFollowers={setOpenFollowers}
                 />
               </Modal>
-              
             </div>
           </>
         )}
       </div>
+      <Modal 
+        isOpen={isModalAvatarImageOpen}
+        setIsModalOpen={setIsModalAvatarImageOpen}
+        type='image'
+      >
+        <img
+          src={`http://localhost:3001/` + user?.image || "default.jpg"}
+          alt=""
+        />
+      </Modal>
       <div>
         {user && authUser?.id === user.id && <CreatePost />}
         {blackListStatus ? (

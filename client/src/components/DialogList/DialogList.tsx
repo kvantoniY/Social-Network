@@ -42,7 +42,7 @@ const DialogsList: React.FC = () => {
       <h2>Ваши диалоги</h2>
       <div>
         {dialogs.map(dialog => (
-          <div key={dialog.id} onClick={() => openDialog(dialog.User1.id, dialog.dialogId)} className={styles.followContainer}>
+          <div key={dialog.id} onClick={() => openDialog(dialog.User1.id, dialog.dialogId)} className='followContainer'>
             <img
               src={`http://localhost:3001/` + (dialog?.User1.image || "default.jpg")}
               alt=""
