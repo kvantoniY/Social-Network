@@ -43,7 +43,7 @@ const FeedPage = () => {
       {error && <p>{error}</p>}
       {posts.length > 0 ? (
         posts.map((post) => (
-          <div>
+          <div key={post.id}>
             <Post key={post.id} post={post} sendMessage={sendMessage} socket={socket} />
           </div>
         ))

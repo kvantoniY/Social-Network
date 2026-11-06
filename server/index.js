@@ -1,3 +1,6 @@
+require('dotenv').config();
+const fs = require('fs');
+fs.mkdirSync(require('path').join(__dirname, 'static'), { recursive: true });
 const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/db');

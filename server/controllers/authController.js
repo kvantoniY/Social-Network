@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
-        const token = jwt.sign({ userId: user.id }, 'allvision', { expiresIn: '7d' });
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -82,7 +82,7 @@ exports.changePassword = async (req, res) => {
         await user.update({ password: hashedPassword });
 
         // Generate a JWT token
-        const token = jwt.sign({ userId: user.id }, 'allvision', { expiresIn: '7d' });
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         // Return the token in the response
         res.status(200).json({ token });

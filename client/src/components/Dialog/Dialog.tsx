@@ -181,7 +181,7 @@ const Dialog: React.FC = () => {
       </Link>
       <div className='messageContainer'>
         {socketMessages.map(message => (
-          <Message message={message} authUser={authUser} handleDeleteMessage={handleDeleteMessage} socket={socket} post={post}/>
+          <Message key={message.id} message={message} authUser={authUser} handleDeleteMessage={handleDeleteMessage} socket={socket} post={post}/>
         ))}
         <div ref={messagesEndRef} />
       </div>

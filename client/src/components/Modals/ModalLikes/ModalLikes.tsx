@@ -14,7 +14,7 @@ const ModalLikes: React.FC<ModalLikesProps> = ({ likes, setIsModalOpen }) => {
       {likes.length > 0 ? (
         <>
           {likes.map(like => (
-            <Link href={`/users/${like.User?.id}`} onClick={() => setIsModalOpen(false)}>
+            <Link key={like.id} href={`/users/${like.User?.id}`} onClick={() => setIsModalOpen(false)}>
               <div className='followContainer'>
                 <img
                   src={`http://localhost:3001/` + like.User?.image || "default.jpg"}
